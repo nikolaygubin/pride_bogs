@@ -1,0 +1,8 @@
+from aiogram import types
+f
+rom create_bot import dp, bot
+
+@dp.message_handler(commands =['start'])
+async def start(message : types.Message):
+    user.id = message.from_user.id
+    await message.answer(f"Доброго времени суток , уважаемый {message.from_user.first_name}, как я могу к Вам обращаться?")
