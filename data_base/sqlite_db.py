@@ -30,10 +30,10 @@ def start_sql():
     if base:
         print("Data base connected")
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS users_bog(id BIGINT PRIMARY KEY,\
+        "CREATE TABLE IF NOT EXISTS users(id BIGINT PRIMARY KEY,\
     tg TEXT, name TEXT, photo TEXT, town TEXT, social_network TEXT, work TEXT,\
     hooks TEXT, expect TEXT, online BOOL, born_date TEXT, purpose TEXT, gender TEXT,\
-    email TEXT, is_sub_active BOOL, date_out_active TEXT, last_pairs BIGINT[], all_pairs BIGINT[], impress_of_meet INT[], active BOOL)"
+    email TEXT, last_pairs BIGINT[], all_pairs BIGINT[], impress_of_meet INT[], active BOOL)"
     )
     base.commit()
 
@@ -53,68 +53,68 @@ async def close_db():
     base.close()
 
 
-async def check_promo(message: types.Message):
-    cursor.execute("SELECT * FROM promo WHERE code = %s", (message.text,))
-    promo = cursor.fetchone()
-    if promo == None:
-        # await message.answer('Введённый промокод не найден!')
-        return 0
-    if promo[2] < 1:
-        # await message.answer('Введённый промокод закончился!')
-        cursor.execute("DELETE FROM promo WHERE code = %s", (promo[0],))
-        base.commit()
-        return 0
-    for id in promo[3]:
-        if id == message.from_user.id:
-            await message.answer("Вы уже активировали этот промокод ранее!")
-            return 0
+# async def check_promo(message: types.Message):
+#     cursor.execute("SELECT * FROM promo WHERE code = %s", (message.text,))
+#     promo = cursor.fetchone()
+#     if promo == None:
+#         # await message.answer('Введённый промокод не найден!')
+#         return 0
+#     if promo[2] < 1:
+#         # await message.answer('Введённый промокод закончился!')
+#         cursor.execute("DELETE FROM promo WHERE code = %s", (promo[0],))
+#         base.commit()
+#         return 0
+#     for id in promo[3]:
+#         if id == message.from_user.id:
+#             await message.answer("Вы уже активировали этот промокод ранее!")
+#             return 0
 
-    cursor.execute(
-        "UPDATE promo SET count = %s, active_id = array_append(active_id, %s) WHERE code = %s",
-        (promo[2] - 1, message.from_user.id, promo[0]),
-    )
-    base.commit()
-    # await message.answer(f'Размер скидки введённого промокода равен {promo[1]}%!')
-    return promo[1]
-
-
-async def insert_promo(message: types.Message):
-    array_values = message.text.split(" ")
-    array_values.append("{ }")
-    if len(array_values) != 5 or int(array_values[1]) < 0:
-        return "Промокод введён некорректно!"
-
-    cursor.execute("SELECT code FROM promo")
-    codes = []
-    promo = cursor.fetchall()
-    for code in promo:
-        codes.append(code[0])
-    if array_values[0] in codes:
-        return "Промокод был добавлен ранее!"
-    else:
-        date = datetime.datetime.now().date()
-        date += datetime.timedelta(days=30 * int(array_values[3]))
-        cursor.execute(
-            "INSERT INTO promo VALUES (%s, %s, %s, %s, %s)",
-            (
-                array_values[0],
-                array_values[1],
-                array_values[2],
-                array_values[4],
-                str(date),
-            ),
-        )
-        base.commit()
-        return "Промокод успешно добавлен!"
+#     cursor.execute(
+#         "UPDATE promo SET count = %s, active_id = array_append(active_id, %s) WHERE code = %s",
+#         (promo[2] - 1, message.from_user.id, promo[0]),
+#     )
+#     base.commit()
+#     # await message.answer(f'Размер скидки введённого промокода равен {promo[1]}%!')
+#     return promo[1]
 
 
-async def remove_promo(message: types.Message):
-    cursor.execute("SELECT * FROM promo WHERE code = %s", (message.text,))
-    if cursor.fetchone() == None:
-        return "Удаляемый промокод не найден"
-    cursor.execute("DELETE FROM promo WHERE code = %s", (message.text,))
-    base.commit()
-    return "Промокод успешно удалён!"
+# async def insert_promo(message: types.Message):
+#     array_values = message.text.split(" ")
+#     array_values.append("{ }")
+#     if len(array_values) != 5 or int(array_values[1]) < 0:
+#         return "Промокод введён некорректно!"
+
+#     cursor.execute("SELECT code FROM promo")
+#     codes = []
+#     promo = cursor.fetchall()
+#     for code in promo:
+#         codes.append(code[0])
+#     if array_values[0] in codes:
+#         return "Промокод был добавлен ранее!"
+#     else:
+#         date = datetime.datetime.now().date()
+#         date += datetime.timedelta(days=30 * int(array_values[3]))
+#         cursor.execute(
+#             "INSERT INTO promo VALUES (%s, %s, %s, %s, %s)",
+#             (
+#                 array_values[0],
+#                 array_values[1],
+#                 array_values[2],
+#                 array_values[4],
+#                 str(date),
+#             ),
+#         )
+#         base.commit()
+#         return "Промокод успешно добавлен!"
+
+
+# async def remove_promo(message: types.Message):
+#     cursor.execute("SELECT * FROM promo WHERE code = %s", (message.text,))
+#     if cursor.fetchone() == None:
+#         return "Удаляемый промокод не найден"
+#     cursor.execute("DELETE FROM promo WHERE code = %s", (message.text,))
+#     base.commit()
+#     return "Промокод успешно удалён!"
 
 
 async def insert_sql(state: FSMContext):
@@ -134,8 +134,8 @@ async def insert_sql(state: FSMContext):
         user_data.append(data["Цель"])
         user_data.append(data["Гендер"])
         user_data.append(data["Email"])
-        user_data.append(data["Оплачено"])
-        user_data.append(data["Дата_окончания_подписки"])
+        # user_data.append(data["Оплачено"])
+        # user_data.append(data["Дата_окончания_подписки"])
         user_data.append("{ }")
         user_data.append("{ }")
         user_data.append("{ }")
@@ -144,18 +144,10 @@ async def insert_sql(state: FSMContext):
     cursor.execute("SELECT * FROM users WHERE id = %s", (user_data[0],))
     user = cursor.fetchone()
     if user != None:
-        print(user_data)
-        if user[14] == True:
-            print(user[14])
-            user_data[14] = "true"
-            user_data[15] = user[15]
-        user_data[16] = user[16]
-        user_data[17] = user[17]
-        user_data[18] = user[18]
         cursor.execute("DELETE FROM users WHERE id = %s", (user[0],))
         base.commit()
     cursor.execute(
-        "INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         tuple(user_data),
     )
     base.commit()
@@ -245,8 +237,8 @@ async def load_info(id, state: FSMContext):
         data["Зацепки"] = user[7]
         data["Ожидания"] = user[8]
         data["Формат"] = user[9]
-        data["Оплачено"] = user[10]
-        data["Дата_окончания_подписки"] = user[11]
+        # data["Оплачено"] = user[10]
+        # data["Дата_окончания_подписки"] = user[11]
 
 
 async def count():
@@ -281,106 +273,106 @@ async def is_register(id):
         return False
 
 
-async def count_paid_subs():
-    cursor.execute("SELECT id FROM users WHERE is_sub_active = %s", ((True),))
-    return len(cursor.fetchall()) - await count_demo_subs()
+# async def count_paid_subs():
+#     cursor.execute("SELECT id FROM users WHERE is_sub_active = %s", ((True),))
+#     return len(cursor.fetchall()) - await count_demo_subs()
 
 
-async def add_user_paid_dynamic(id, count_month) :
-    try:
-        cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
-        user = cursor.fetchone()
-        if user[14] == True:
-            mas_date = user[15].split("-")
-            date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
-            for i in range(count_month):
-                days_month = calendar.monthrange(date.year, date.month)[1]
-                date += datetime.timedelta(days=days_month)
-            str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
-        else:
-            date = datetime.datetime.now().date()
-            for i in range(count_month):
-                days_month = calendar.monthrange(date.year, date.month)[1]
-                date += datetime.timedelta(days=days_month)
-            str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
+# async def add_user_paid_dynamic(id, count_month) :
+#     try:
+#         cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
+#         user = cursor.fetchone()
+#         if user[14] == True:
+#             mas_date = user[15].split("-")
+#             date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
+#             for i in range(count_month):
+#                 days_month = calendar.monthrange(date.year, date.month)[1]
+#                 date += datetime.timedelta(days=days_month)
+#             str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
+#         else:
+#             date = datetime.datetime.now().date()
+#             for i in range(count_month):
+#                 days_month = calendar.monthrange(date.year, date.month)[1]
+#                 date += datetime.timedelta(days=days_month)
+#             str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
 
-        cursor.execute(
-            "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
-            (True, str_date, id),
-        )
-        base.commit()
-        await bot.send_message(id, "Данные об оплате успешно записаны!")
-        month = str()
-        if count_month == 1:
-            month = 'месяц'
-        elif count_month < 5:
-            month = 'месяца'
-        else:
-            month = 'месяцев'  
-        await bot.send_message(id, f'Вы ввели уникальный промокод, ваша подписка продлена на {count_month} {month}!👌')
-    except Exception as ex:
-        print(ex)
-        await bot.send_message(id, "Не удалось записать данные об оплате!")  
+#         cursor.execute(
+#             "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
+#             (True, str_date, id),
+#         )
+#         base.commit()
+#         await bot.send_message(id, "Данные об оплате успешно записаны!")
+#         month = str()
+#         if count_month == 1:
+#             month = 'месяц'
+#         elif count_month < 5:
+#             month = 'месяца'
+#         else:
+#             month = 'месяцев'  
+#         await bot.send_message(id, f'Вы ввели уникальный промокод, ваша подписка продлена на {count_month} {month}!👌')
+#     except Exception as ex:
+#         print(ex)
+#         await bot.send_message(id, "Не удалось записать данные об оплате!")  
 
-async def add_user_paid(id):
-    cursor.execute('DELETE FROM demo_users WHERE user_id = %s', (id, ))
-    base.commit()
-    try:
-        cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
-        user = cursor.fetchone()
-        if user[14] == True:
-            mas_date = user[15].split("-")
-            date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
-            days_month = calendar.monthrange(int(mas_date[0]), int(mas_date[1]))[1]
-            date += datetime.timedelta(days=days_month)
-            str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
-        else:
-            date = datetime.datetime.now().date()
-            days_month = calendar.monthrange(date.year, date.month)[1]
-            date += datetime.timedelta(days=days_month)
-            str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
+# async def add_user_paid(id):
+#     cursor.execute('DELETE FROM demo_users WHERE user_id = %s', (id, ))
+#     base.commit()
+#     try:
+#         cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
+#         user = cursor.fetchone()
+#         if user[14] == True:
+#             mas_date = user[15].split("-")
+#             date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
+#             days_month = calendar.monthrange(int(mas_date[0]), int(mas_date[1]))[1]
+#             date += datetime.timedelta(days=days_month)
+#             str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
+#         else:
+#             date = datetime.datetime.now().date()
+#             days_month = calendar.monthrange(date.year, date.month)[1]
+#             date += datetime.timedelta(days=days_month)
+#             str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
 
-        cursor.execute(
-            "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
-            (True, str_date, id),
-        )
-        base.commit()
-        await bot.send_message(id, "Данные об оплате успешно записаны!")
-    except Exception as ex:
-        print(ex)
-        await bot.send_message(id, "Не удалось записать данные об оплате!")
-
-
-async def add_user_paid_year(id):
-    try:
-        cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
-        user = cursor.fetchone()
-        if user[14] == True:
-            mas_date = user[15].split("-")
-            date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
-            date += datetime.timedelta(days=365)
-            str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
-        else:
-            date = datetime.datetime.now().date()
-            date += datetime.timedelta(days=365)
-            str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
-
-        cursor.execute(
-            "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
-            (True, str_date, id),
-        )
-        base.commit()
-        await bot.send_message(id, "Данные об оплате успешно записаны!")
-    except Exception as ex:
-        print(ex)
-        await bot.send_message(id, "Не удалось записать данные об оплате!")
+#         cursor.execute(
+#             "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
+#             (True, str_date, id),
+#         )
+#         base.commit()
+#         await bot.send_message(id, "Данные об оплате успешно записаны!")
+#     except Exception as ex:
+#         print(ex)
+#         await bot.send_message(id, "Не удалось записать данные об оплате!")
 
 
-async def check_paid(id):
-    cursor.execute(
-        "SELECT is_sub_active, date_out_active FROM users WHERE id = %s", (id,)
-    )
-    return cursor.fetchone()
+# async def add_user_paid_year(id):
+#     try:
+#         cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
+#         user = cursor.fetchone()
+#         if user[14] == True:
+#             mas_date = user[15].split("-")
+#             date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
+#             date += datetime.timedelta(days=365)
+#             str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
+#         else:
+#             date = datetime.datetime.now().date()
+#             date += datetime.timedelta(days=365)
+#             str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
+
+#         cursor.execute(
+#             "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
+#             (True, str_date, id),
+#         )
+#         base.commit()
+#         await bot.send_message(id, "Данные об оплате успешно записаны!")
+#     except Exception as ex:
+#         print(ex)
+#         await bot.send_message(id, "Не удалось записать данные об оплате!")
+
+
+# async def check_paid(id):
+#     cursor.execute(
+#         "SELECT is_sub_active, date_out_active FROM users WHERE id = %s", (id,)
+#     )
+#     return cursor.fetchone()
 
 
 async def get_offline_users():
@@ -630,15 +622,15 @@ async def active_users():
     return len(cursor.fetchall())
 
 
-async def get_paid_users():
-    cursor.execute("SELECT id FROM users where is_sub_active = true")
-    id_list = []
-    users = cursor.fetchall()
-    if users == None:
-        return []
-    for user in users:
-        id_list.append(user[0])
-    return id_list
+# async def get_paid_users():
+#     cursor.execute("SELECT id FROM users where is_sub_active = true")
+#     id_list = []
+#     users = cursor.fetchall()
+#     if users == None:
+#         return []
+#     for user in users:
+#         id_list.append(user[0])
+#     return id_list
 
 
 async def write_active(active: bool, id: int):
@@ -646,12 +638,12 @@ async def write_active(active: bool, id: int):
     base.commit()
 
 
-async def get_promocodes():
-    cursor.execute("SELECT * FROM promo")
-    promocodes = cursor.fetchall()
-    if promocodes == None:
-        return []
-    return promocodes
+# async def get_promocodes():
+#     cursor.execute("SELECT * FROM promo")
+#     promocodes = cursor.fetchall()
+#     if promocodes == None:
+#         return []
+#     return promocodes
 
 
 async def remove_active(id: int):
@@ -659,50 +651,50 @@ async def remove_active(id: int):
     base.commit()
 
 
-async def update():
-    cursor.execute("SELECT id, date_out_active FROM users WHERE is_sub_active = true")
-    paid_users = cursor.fetchall()
-    present = datetime.datetime.now().date()
-    counter = 0
-    for user in paid_users:
-        mas_date = user[1].split("-")
-        date_out = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
-        if date_out < present:
-            counter += 1
-            await remove_active(user[0])
-            try:
-                await bot.send_message(
-                    user[0],
-                    "Ваша подписка истекла, чтобы дальше продолжать подбор собеседников совершите оплату",
-                )
-            except:
-                pass
-    return counter
+# async def update():
+#     cursor.execute("SELECT id, date_out_active FROM users WHERE is_sub_active = true")
+#     paid_users = cursor.fetchall()
+#     present = datetime.datetime.now().date()
+#     counter = 0
+#     for user in paid_users:
+#         mas_date = user[1].split("-")
+#         date_out = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
+#         if date_out < present:
+#             counter += 1
+#             await remove_active(user[0])
+#             try:
+#                 await bot.send_message(
+#                     user[0],
+#                     "Ваша подписка истекла, чтобы дальше продолжать подбор собеседников совершите оплату",
+#                 )
+#             except:
+#                 pass
+#     return counter
 
 
-async def add_demo_paid(id: int):
-    cursor.execute("SELECT * FROM demo_users")
-    users = cursor.fetchall()
-    for user in users:
-        if user[0] == id:
-            return
-    cursor.execute("INSERT INTO demo_users VALUES(%s)", (id,))
-    base.commit()
+# async def add_demo_paid(id: int):
+#     cursor.execute("SELECT * FROM demo_users")
+#     users = cursor.fetchall()
+#     for user in users:
+#         if user[0] == id:
+#             return
+#     cursor.execute("INSERT INTO demo_users VALUES(%s)", (id,))
+#     base.commit()
 
 
-async def remove_demo_user(id: int):
-    cursor.execute("SELECT * FROM demo_users WHERE user_id = %s", (id,))
+# async def remove_demo_user(id: int):
+#     cursor.execute("SELECT * FROM demo_users WHERE user_id = %s", (id,))
 
-    user = cursor.fetchone()
-    if user == None:
-        return
-    cursor.execute("DELETE FROM demo_users WHERE user_id = %s", (id,))
-    base.commit()
+#     user = cursor.fetchone()
+#     if user == None:
+#         return
+#     cursor.execute("DELETE FROM demo_users WHERE user_id = %s", (id,))
+#     base.commit()
 
 
-async def count_demo_subs():
-    cursor.execute("SELECT * FROM demo_users")
-    return len(cursor.fetchall())
+# async def count_demo_subs():
+#     cursor.execute("SELECT * FROM demo_users")
+#     return len(cursor.fetchall())
 
 
 async def get_photo(id):
@@ -770,41 +762,41 @@ async def add_one_week(id):
         await bot.send_message(id, "Не удалось записать данные об оплате!")
 
 
-async def del_out_promo():
-    cursor.execute("SELECT * FROM promo")
-    promocodes = cursor.fetchall()
+# async def del_out_promo():
+#     cursor.execute("SELECT * FROM promo")
+#     promocodes = cursor.fetchall()
 
-    for promo in promocodes:
-        date = promo[4].split("-")
-        out_date = datetime.date(
-            year=int(date[0]), month=int(date[1]), day=int(date[2])
-        )
-        now_date = datetime.datetime.now().date()
-        if now_date > out_date:
-            cursor.execute("DELETE FROM promo WHERE code = %s", (promo[0],))
-            base.commit()
+#     for promo in promocodes:
+#         date = promo[4].split("-")
+#         out_date = datetime.date(
+#             year=int(date[0]), month=int(date[1]), day=int(date[2])
+#         )
+#         now_date = datetime.datetime.now().date()
+#         if now_date > out_date:
+#             cursor.execute("DELETE FROM promo WHERE code = %s", (promo[0],))
+#             base.commit()
             
-async def add_ref(ref_name : str, id : int):
-    cursor.execute('SELECT * FROM refs WHERE refcode = %s', (ref_name, ))
-    ref_user = cursor.fetchone()
-    if ref_user == None:
-        return
+# async def add_ref(ref_name : str, id : int):
+#     cursor.execute('SELECT * FROM refs WHERE refcode = %s', (ref_name, ))
+#     ref_user = cursor.fetchone()
+#     if ref_user == None:
+#         return
     
-    cursor.execute('SELECT * FROM refs')
-    ref_users = cursor.fetchall()
-    for i in range(len(ref_users)):
-        if id in ref_users[i][1]:
-            return
+#     cursor.execute('SELECT * FROM refs')
+#     ref_users = cursor.fetchall()
+#     for i in range(len(ref_users)):
+#         if id in ref_users[i][1]:
+#             return
     
-    cursor.execute('UPDATE refs SET number = %s, id = array_append(id, %s) WHERE refcode = %s', (ref_user[2] + 1, id, ref_name,))
-    base.commit()
+#     cursor.execute('UPDATE refs SET number = %s, id = array_append(id, %s) WHERE refcode = %s', (ref_user[2] + 1, id, ref_name,))
+#     base.commit()
             
-async def get_refs():
-    cursor.execute('SELECT * FROM refs');
-    refs = cursor.fetchall()
+# async def get_refs():
+#     cursor.execute('SELECT * FROM refs');
+#     refs = cursor.fetchall()
     
-    data = str()
-    for ref in refs:
-        data += f'{ref[0]} : {ref[2]} рефералов\n'
+#     data = str()
+#     for ref in refs:
+#         data += f'{ref[0]} : {ref[2]} рефералов\n'
     
-    return data
+#     return data
