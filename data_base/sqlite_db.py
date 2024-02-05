@@ -17,12 +17,12 @@ from keyboards.client_kb import (
 
 def start_sql():
     global base, cursor
-    result = urlparse(os.environ.get("DATABASE_URL"))
+    result = urlparse("postgres://postgres:3bfd95ec15e0304a2274f068edef7398@salam:30161/salam")
     username = result.username
     password = result.password
     database = result.path[1:]
-    hostname = result.hostname
-    port = result.port
+    hostname = "185.251.89.100"
+    port = 30161
     base = ps.connect(
         port=port, host=hostname, user=username, password=password, database=database
     )
@@ -30,7 +30,7 @@ def start_sql():
     if base:
         print("Data base connected")
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS users(id BIGINT PRIMARY KEY,\
+        "CREATE TABLE IF NOT EXISTS users_bog(id BIGINT PRIMARY KEY,\
     tg TEXT, name TEXT, photo TEXT, town TEXT, social_network TEXT, work TEXT,\
     hooks TEXT, expect TEXT, online BOOL, born_date TEXT, purpose TEXT, gender TEXT,\
     email TEXT, is_sub_active BOOL, date_out_active TEXT, last_pairs BIGINT[], all_pairs BIGINT[], impress_of_meet INT[], active BOOL)"
