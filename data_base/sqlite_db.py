@@ -29,11 +29,13 @@ def start_sql():
     cursor = base.cursor()
     if base:
         print("Data base connected")
+    cursor.execute("DROP TABLE users")
+    base.commit()
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS users(id BIGINT PRIMARY KEY,\
     tg TEXT, name TEXT, photo TEXT, town TEXT, social_network TEXT, work TEXT,\
     hooks TEXT, expect TEXT, online BOOL, born_date TEXT, purpose TEXT, gender TEXT,\
-    email TEXT, last_pairs BIGINT[], all_pairs BIGINT[], impress_of_meet INT[], active BOOL)"
+        last_pairs BIGINT[], all_pairs BIGINT[], impress_of_meet INT[], active BOOL)"
     )
     base.commit()
 
@@ -125,7 +127,7 @@ async def insert_sql(state: FSMContext):
         user_data.append(data["Имя"])
         user_data.append(data["Фото"])
         user_data.append(data["Город"])
-        user_data.append(data["Социальные сети"])
+        user_data.append(data["Номер телефона"])
         user_data.append(data["Работа"])
         user_data.append(data["Зацепки"])
         user_data.append(data["Ожидания"])
@@ -133,7 +135,6 @@ async def insert_sql(state: FSMContext):
         user_data.append(data["Дата"])
         user_data.append(data["Цель"])
         user_data.append(data["Гендер"])
-        user_data.append(data["Email"])
         # user_data.append(data["Оплачено"])
         # user_data.append(data["Дата_окончания_подписки"])
         user_data.append("{ }")
@@ -147,7 +148,7 @@ async def insert_sql(state: FSMContext):
         cursor.execute("DELETE FROM users WHERE id = %s", (user[0],))
         base.commit()
     cursor.execute(
-        "INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         tuple(user_data),
     )
     base.commit()
@@ -174,8 +175,6 @@ async def insert_point(column: str, id: int, text: str):
         cursor.execute("UPDATE users SET born_date = %s WHERE id = %s", (text, id))
     elif column == "purpose":
         cursor.execute("UPDATE users SET purpose = %s WHERE id = %s", (text, id))
-    elif column == "email":
-        cursor.execute("UPDATE users SET email = %s WHERE id = %s", (text, id))
     base.commit()
 
 

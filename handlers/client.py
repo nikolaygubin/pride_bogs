@@ -46,12 +46,12 @@ class Client(StatesGroup):
     born = State()
     purpose = State()
     gender = State()
-    email = State()
+    # email = State()
      
-    start_pay = State()
-    buy_month = State()
-    buy_year = State()
-    get_promocode = State()
+    # start_pay = State()
+    # buy_month = State()
+    # buy_year = State()
+    # get_promocode = State()
     
 class Change(StatesGroup):  
     change_start = State()
@@ -371,21 +371,23 @@ async def enter_town(callback_query : types.CallbackQuery, state : FSMContext):
 
 # обработка получения социальной сети
 async def get_social_network(message : types.Message, state : FSMContext):
-    url = message.text
-    if url[:4] != 'http':
-        url = 'https://' + url
+    phone_number = message.text
     async with state.proxy() as data:
-        if not validators.url(url):
+        if not phone_number.isdigit() or len(phone_number) != 11:  # Assuming the phone number should be 10 digits
             msg = types.Message.to_object(data['Last_message'])
-            await msg.delete_reply_markup()
-            msg = await bot.send_message(message.from_user.id, 'Ваше сообщение не является ссылкой! Пожалуйста отправьте ссылку на вашу социальную сеть.\n Например: Вконтакте, Инстаграм', reply_markup=inline_kb_quest_social) 
-            data['Last_message'] = msg.to_python()             
+            try:
+                await msg.delete_reply_markup()
+            except:
+                pass
+            msg = await bot.send_message(message.from_user.id, 'Некорректный номер телефона! Пожалуйста введите 11 значный номер.')
+            data['Last_message'] = msg.to_python()
             return
-        data['Социальные сети'] = url
+
+        data['Номер телефона'] = phone_number
         msg = types.Message.to_object(data['Last_message'])
-        await msg.delete_reply_markup() 
-        msg = await message.answer(GET_WORK, reply_markup=inline_kb_quest)  
-        data['Last_message'] = msg.to_python()    
+        await msg.delete_reply_markup()
+        msg = await message.answer(GET_WORK, reply_markup=inline_kb_quest)
+        data['Last_message'] = msg.to_python()
     await Client.next()
 
     
@@ -513,9 +515,21 @@ async def get_male(callback_query : types.CallbackQuery, state : FSMContext):
         data['Гендер'] = 'Мужчина'
         msg = types.Message.to_object(data['Last_message'])
         await msg.edit_text(msg.text + '\n\n➡️ Мужчина', reply_markup=None)
-        msg = await bot.send_message(callback_query.from_user.id, GET_EMAIL, reply_markup=inline_kb_quest)
+        msg = await bot.send_message(callback_query.from_user.id,TEXT_PROFILE,reply_markup=inline_kb_quest)
         data['Last_message'] = msg.to_python()
-    await Client.next()
+    await sqlite_db.insert_sql(state)
+    values = list(await sqlite_db.get_profile(message.from_user.id))
+    age = datetime.datetime.now().year - int(values[10].split('.')[2])
+    format = str()
+    if values[9]:
+        format = 'Онлайн'
+    else :
+        format = 'Оффлайн'
+    card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
+{values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
+    async with state.proxy() as data:
+        msg = await message.answer(TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
+        data['Last_message'] = msg.to_python()  
     
 async def get_female(callback_query : types.CallbackQuery, state : FSMContext):
     await callback_query.answer()
@@ -523,9 +537,21 @@ async def get_female(callback_query : types.CallbackQuery, state : FSMContext):
         data['Гендер'] = 'Женщина'
         msg = types.Message.to_object(data['Last_message'])
         await msg.edit_text(msg.text + '\n\n➡️ Женщина', reply_markup=None)
-        msg = await bot.send_message(callback_query.from_user.id, GET_EMAIL, reply_markup=inline_kb_quest)
+        msg = await bot.send_message(callback_query.from_user.id, TEXT_PROFILE, reply_markup=inline_kb_quest)
         data['Last_message'] = msg.to_python()
-    await Client.next()    
+    await sqlite_db.insert_sql(state)
+    values = list(await sqlite_db.get_profile(message.from_user.id))
+    age = datetime.datetime.now().year - int(values[10].split('.')[2])
+    format = str()
+    if values[9]:
+        format = 'Онлайн'
+    else :
+        format = 'Оффлайн'
+    card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
+{values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
+    async with state.proxy() as data:
+        msg = await message.answer(TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
+        data['Last_message'] = msg.to_python()      
     
 async def get_email(message : types.Message, state : FSMContext):
     async with state.proxy() as data:
@@ -543,7 +569,7 @@ async def get_email(message : types.Message, state : FSMContext):
         format = 'Онлайн'
     else :
         format = 'Оффлайн'
-    card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nСоциальная сеть: {values[5]}\n\nЧем занимается: \
+    card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
 {values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
     async with state.proxy() as data:
         msg = await message.answer(TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
@@ -769,7 +795,7 @@ async def show_profile(callback_query : types.CallbackQuery, state = FSMContext)
     else :
         format = 'Оффлайн'
     card = f'Вот так будет выглядеть твой профиль в сообщении,\
-которое мы пришлем твоему собеседнику:\n⏬\n\n{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nСоциальная сеть: {values[5]}\n\nЧем занимается: \
+которое мы пришлем твоему собеседнику:\n⏬\n\n{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
 {values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'        
 
     async with state.proxy() as data:
@@ -933,7 +959,7 @@ async def change_work(callback_query : types.CallbackQuery, state : FSMContext):
     await callback_query.answer()
     async with state.proxy() as data:
         msg = types.Message.to_object(data['Main_message'])
-        await msg.edit_text('Из какой ты ниши? Чем занимаешься?', reply_markup=kb_back_change) 
+        await msg.edit_text('Из какой ты ниши? Какая Сфера деятельности?', reply_markup=kb_back_change) 
         data['Change_object'] = 'work'
     await Change.next()
                     
@@ -985,14 +1011,14 @@ async def change_purpose(callback_query : types.CallbackQuery, state : FSMContex
         data['Change_object'] = 'purpose'   
     await Change.next()    
     
-async def change_email(callback_query : types.CallbackQuery, state : FSMContext):
-    await callback_query.answer()
-    async with state.proxy() as data:
-        msg = types.Message.to_object(data['Main_message'])
-        await msg.edit_text('Введи свой email, для эффективной работы бота⚡️\n\n\
-Так мы сможем уведомлять тебя о новых событиях, если новости станут для тебя неактуальны, ты всегда сможешь отписаться.', reply_markup=kb_back_change)
-        data['Change_object'] = 'email'   
-    await Change.next()   
+# async def change_email(callback_query : types.CallbackQuery, state : FSMContext):
+#     await callback_query.answer()
+#     async with state.proxy() as data:
+#         msg = types.Message.to_object(data['Main_message'])
+#         await msg.edit_text('Введи свой email, для эффективной работы бота⚡️\n\n\
+# Так мы сможем уведомлять тебя о новых событиях, если новости станут для тебя неактуальны, ты всегда сможешь отписаться.', reply_markup=kb_back_change)
+#         data['Change_object'] = 'email'   
+#     await Change.next()   
                             
 async def change_exit(callback_query : types.CallbackQuery, state :  FSMContext):
     await callback_query.answer()
@@ -1340,7 +1366,7 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_callback_query_handler(get_male, Text(equals='male', ignore_case=True), state=Client.gender)
     dp.register_callback_query_handler(get_female, Text(equals='female', ignore_case=True), state=Client.gender)
     
-    dp.register_message_handler(get_email, state=Client.email)
+    # dp.register_message_handler(get_email, state=Client.email)
 
     dp.register_callback_query_handler(succses, Text(equals='succses', ignore_case=True), state='*')
     dp.register_callback_query_handler(fill_again, Text(equals='fill_again', ignore_case=True), state='*')
@@ -1404,7 +1430,7 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_callback_query_handler(set_change_purpose, Text(equals='4_purpose', ignore_case=True), state=Change.change_state)
     dp.register_callback_query_handler(set_change_purpose, Text(equals='5_purpose', ignore_case=True), state=Change.change_state)    
     
-    dp.register_callback_query_handler(change_email, Text(equals='change_email', ignore_case=True), state=Change.change_start)    
+    # dp.register_callback_query_handler(change_email, Text(equals='change_email', ignore_case=True), state=Change.change_start)    
     
     dp.register_message_handler(set_change, content_types=ContentType.TEXT, state=Change.change_state)
     
