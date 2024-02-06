@@ -17,24 +17,22 @@ from keyboards.client_kb import (
 
 def start_sql():
     global base, cursor
-    result = urlparse("postgres://postgres:3bfd95ec15e0304a2274f068edef7398@salam:30161/salam")
+    result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
     username = result.username
     password = result.password
     database = result.path[1:]
     hostname = "185.251.89.100"
-    port = 30161
+    port = 29280
     base = ps.connect(
         port=port, host=hostname, user=username, password=password, database=database
     )
     cursor = base.cursor()
     if base:
         print("Data base connected")
-    cursor.execute("DROP TABLE users")
-    base.commit()
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS users(id BIGINT PRIMARY KEY,\
     tg TEXT, name TEXT, photo TEXT, town TEXT, social_network TEXT, work TEXT,\
-    hooks TEXT, expect TEXT, online BOOL, born_date TEXT, purpose TEXT, gender TEXT,\
+    company TEXT, hooks TEXT, expect TEXT, online BOOL, born_date TEXT, purpose TEXT, gender TEXT,\
         last_pairs BIGINT[], all_pairs BIGINT[], impress_of_meet INT[], active BOOL)"
     )
     base.commit()
@@ -129,18 +127,19 @@ async def insert_sql(state: FSMContext):
         user_data.append(data["Город"])
         user_data.append(data["Номер телефона"])
         user_data.append(data["Работа"])
+        user_data.append(data["Компания"])
         user_data.append(data["Зацепки"])
         user_data.append(data["Ожидания"])
         user_data.append(data["Формат"])
         user_data.append(data["Дата"])
         user_data.append(data["Цель"])
         user_data.append(data["Гендер"])
-        # user_data.append(data["Оплачено"])
-        # user_data.append(data["Дата_окончания_подписки"])
         user_data.append("{ }")
         user_data.append("{ }")
         user_data.append("{ }")
         user_data.append("true")
+        
+    print(user_data)
 
     cursor.execute("SELECT * FROM users WHERE id = %s", (user_data[0],))
     user = cursor.fetchone()
@@ -165,6 +164,8 @@ async def insert_point(column: str, id: int, text: str):
         cursor.execute("UPDATE users SET social_network = %s WHERE id = %s", (text, id))
     elif column == "work":
         cursor.execute("UPDATE users SET work = %s WHERE id = %s", (text, id))
+    elif column == "company":
+        cursor.execute("UPDATE users SET company = %s WHERE id = %s", (text, id))
     elif column == "hooks":
         cursor.execute("UPDATE users SET hooks = %s WHERE id = %s", (text, id))
     elif column == "expect":
@@ -204,7 +205,7 @@ async def read_sql(id):
             id,
             f"id : {data[0]}\nТелеграм : {data[1]}\n\
 Имя : {data[2]}\nГород : {data[3]}\nСоциальные сети : {data[4]}\
-\nРабота/увлечения : {data[5]}\nИнтересы/хобби : {data[6]}\nОжидания от встречи: {data[7]}\n",
+\nРабота/увлечения : {data[5]}\nИнтересы/хобби : {data[7]}\nОжидания от встречи: {data[8]}\n",
         )
 
 

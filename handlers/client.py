@@ -40,6 +40,7 @@ class Client(StatesGroup):
     town = State()  # дополнительная проверка на корректный город
     social_network = State()
     work = State()
+    company = State()
     hooks = State()
     expect = State()
     format = State()
@@ -70,11 +71,6 @@ class Menu(StatesGroup):
 async def back(callback_query : types.CallbackQuery, state : FSMContext):
     await callback_query.answer()
     current_state = await state.get_state()
-    async with state.proxy() as data:
-        if current_state != Client.buy_month.state and current_state != Client.buy_year.state and current_state != Client.get_promocode.state:
-            msg : types.Message = types.Message.to_object(data['Last_message'])
-            await msg.edit_reply_markup(None)
-            await msg.delete()
     if current_state == Client.town.state or current_state == Client.username.state:
         async with state.proxy() as data:    
             msg = await bot.send_message(callback_query.from_user.id, GET_NAME)
@@ -93,6 +89,10 @@ async def back(callback_query : types.CallbackQuery, state : FSMContext):
     elif current_state == Client.hooks.state:
         async with state.proxy() as data:
             msg = await bot.send_message(callback_query.from_user.id, GET_WORK, reply_markup=inline_kb_quest) 
+            data['Last_message'] = msg.to_python()
+    elif current_state == Client.company.state:
+        async with state.proxy() as data:
+            msg = await bot.send_message(callback_query.from_user.id, GET_COMPANY, reply_markup=inline_kb_quest) 
             data['Last_message'] = msg.to_python()
     elif current_state == Client.expect.state:
         async with state.proxy() as data:
@@ -398,9 +398,19 @@ async def get_work(message : types.Message, state : FSMContext):
         data['Работа'] = message.text
         msg = types.Message.to_object(data['Last_message'])
         await msg.delete_reply_markup()
+        msg = await message.answer(GET_COMPANY, reply_markup=inline_kb_quest) 
+        data['Last_message'] = msg.to_python()    
+    await Client.next()
+
+async def get_company(message : types.Message, state : FSMContext):
+    async with state.proxy() as data:
+        data['Компания'] = message.text
+        msg = types.Message.to_object(data['Last_message'])
+        await msg.delete_reply_markup()
         msg = await message.answer(GET_HOBBY, reply_markup=inline_kb_quest) 
         data['Last_message'] = msg.to_python()    
     await Client.next()
+    
 
 # обработка получения зацепок
 async def get_hooks(message : types.Message, state : FSMContext): 
@@ -515,10 +525,9 @@ async def get_male(callback_query : types.CallbackQuery, state : FSMContext):
         data['Гендер'] = 'Мужчина'
         msg = types.Message.to_object(data['Last_message'])
         await msg.edit_text(msg.text + '\n\n➡️ Мужчина', reply_markup=None)
-        msg = await bot.send_message(callback_query.from_user.id,TEXT_PROFILE,reply_markup=inline_kb_quest)
         data['Last_message'] = msg.to_python()
     await sqlite_db.insert_sql(state)
-    values = list(await sqlite_db.get_profile(message.from_user.id))
+    values = list(await sqlite_db.get_profile(callback_query.from_user.id))
     age = datetime.datetime.now().year - int(values[10].split('.')[2])
     format = str()
     if values[9]:
@@ -526,9 +535,9 @@ async def get_male(callback_query : types.CallbackQuery, state : FSMContext):
     else :
         format = 'Оффлайн'
     card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
-{values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
+{values[6]}\n\nИнтересы/Ресурсы/ Хобби: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
     async with state.proxy() as data:
-        msg = await message.answer(TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
+        msg = await bot.send_message(callback_query.from_user.id, TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
         data['Last_message'] = msg.to_python()  
     
 async def get_female(callback_query : types.CallbackQuery, state : FSMContext):
@@ -537,10 +546,9 @@ async def get_female(callback_query : types.CallbackQuery, state : FSMContext):
         data['Гендер'] = 'Женщина'
         msg = types.Message.to_object(data['Last_message'])
         await msg.edit_text(msg.text + '\n\n➡️ Женщина', reply_markup=None)
-        msg = await bot.send_message(callback_query.from_user.id, TEXT_PROFILE, reply_markup=inline_kb_quest)
         data['Last_message'] = msg.to_python()
     await sqlite_db.insert_sql(state)
-    values = list(await sqlite_db.get_profile(message.from_user.id))
+    values = list(await sqlite_db.get_profile(callback_query.from_user.id))
     age = datetime.datetime.now().year - int(values[10].split('.')[2])
     format = str()
     if values[9]:
@@ -548,32 +556,32 @@ async def get_female(callback_query : types.CallbackQuery, state : FSMContext):
     else :
         format = 'Оффлайн'
     card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
-{values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
+{values[6]}\n\nИнтересы/Ресурсы/ Хобби: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
     async with state.proxy() as data:
-        msg = await message.answer(TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
+        msg = await bot.send_message(callback_query.from_user.id, TEXT_PROFILE + card, reply_markup=inline_kb_succses)          
         data['Last_message'] = msg.to_python()      
     
-async def get_email(message : types.Message, state : FSMContext):
-    async with state.proxy() as data:
-        msg = types.Message.to_object(data['Last_message'])
-        # await msg.delete_reply_markup()
-        await msg.delete_reply_markup()
-        data['Email'] = message.text
-        # data['Оплачено'] = False
-        # data['Дата_окончания_подписки'] = None
-    await sqlite_db.insert_sql(state)
-    values = list(await sqlite_db.get_profile(message.from_user.id))
-    age = datetime.datetime.now().year - int(values[10].split('.')[2])
-    format = str()
-    if values[9]:
-        format = 'Онлайн'
-    else :
-        format = 'Оффлайн'
-    card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
-{values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
-    async with state.proxy() as data:
-        msg = await message.answer(TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
-        data['Last_message'] = msg.to_python()  
+# async def get_email(message : types.Message, state : FSMContext):
+#     async with state.proxy() as data:
+#         msg = types.Message.to_object(data['Last_message'])
+#         # await msg.delete_reply_markup()
+#         await msg.delete_reply_markup()
+#         data['Email'] = message.text
+#         # data['Оплачено'] = False
+#         # data['Дата_окончания_подписки'] = None
+#     await sqlite_db.insert_sql(state)
+#     values = list(await sqlite_db.get_profile(message.from_user.id))
+#     age = datetime.datetime.now().year - int(values[10].split('.')[2])
+#     format = str()
+#     if values[9]:
+#         format = 'Онлайн'
+#     else :
+#         format = 'Оффлайн'
+#     card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
+# {values[6]}\n\nЗацепки для начала разговора: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[11]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[8]}'    
+#     async with state.proxy() as data:
+#         msg = await message.answer(TEXT_PROFILE + card, reply_markup=inline_kb_succses)        
+#         data['Last_message'] = msg.to_python()  
    
 async def fill_again(callback_query : types.CallbackQuery, state : FSMContext):
     await callback_query.answer()
@@ -1343,6 +1351,8 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(get_social_network, state=Client.social_network)
     
     dp.register_message_handler(get_work, state=Client.work)
+    
+    dp.register_message_handler(get_company, state=Client.company)
     
     dp.register_message_handler(get_hooks, state=Client.hooks)
     
