@@ -20,20 +20,17 @@ inline_kb_panel = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardB
                 
 inline_kb_statistics = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Количество пользователей', callback_data='count_users')).add(
                 InlineKeyboardButton(text='Количество по городам', callback_data='count_users_town')).add(
-                # InlineKeyboardButton(text='Кол-во платных подписок', callback_data='paid_users')).add(
-                # InlineKeyboardButton(text='Кол-во демо подписок', callback_data='demo_users')).add(
                 InlineKeyboardButton(text='Кол-во активных пользователей', callback_data='active_users')).add(
-                InlineKeyboardButton(text='Рефералы', callback_data='refs')).add(
                 InlineKeyboardButton(text='Назад', callback_data='back_admin_main'))  
                 
 inline_kb_actions = InlineKeyboardMarkup(resize_keyboard=True).add(
                 InlineKeyboardButton(text='Отправить сообщение всем', callback_data='send_message')).add(
                 InlineKeyboardButton(text='Подобрать пары всем', callback_data='make_pairs')).add(
-                InlineKeyboardButton(text='Подобрать extra пары', callback_data='make_extra_pairs')).add(
-                # InlineKeyboardButton(text='Пересмотреть подписки', callback_data='see_active')).add(
                 InlineKeyboardButton(text='Опросить всех на активность', callback_data='ask_active')).add(
                 InlineKeyboardButton(text='Опрос впечатлений от встречи', callback_data='ask_impress_admin')).add(
                 InlineKeyboardButton(text='Назад', callback_data='back_admin_main'))
+                # InlineKeyboardButton(text='Подобрать extra пары', callback_data='make_extra_pairs')).add(
+                # InlineKeyboardButton(text='Пересмотреть подписки', callback_data='see_active')).add(
                 
 # inline_kb_promo = InlineKeyboardMarkup(resize_keyboard=True).add(
 #                 InlineKeyboardButton(text='Показать промокоды', callback_data='show_promo')).add(

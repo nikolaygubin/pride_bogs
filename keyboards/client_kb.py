@@ -7,14 +7,14 @@ inl_button3 = InlineKeyboardButton(text='Заполнить заново', callb
 inl_menuchange_button1 = InlineKeyboardButton(text='Имя', callback_data='change_name')
 inl_menuchange_button2 = InlineKeyboardButton(text='Фото', callback_data='change_photo')
 inl_menuchange_button3 = InlineKeyboardButton(text='Город', callback_data='change_town')
-inl_menuchange_button4 = InlineKeyboardButton(text='Социальные сети', callback_data='change_social_network')
-inl_menuchange_button5 = InlineKeyboardButton(text='Занятия/работа', callback_data='change_work')
-inl_menuchange_button6 = InlineKeyboardButton(text='Хобби/увлечения', callback_data='change_hobby')
-inl_menuchange_button7 = InlineKeyboardButton(text='Формат встреч', callback_data='change_format')
-inl_menuchange_button8 = InlineKeyboardButton(text='Ожидания', callback_data='change_expect')
-inl_menuchange_button9 = InlineKeyboardButton(text='Возраст', callback_data='change_data')
-inl_menuchange_button10 = InlineKeyboardButton(text='Цель', callback_data='change_purpose')
-inl_menuchange_button11 = InlineKeyboardButton(text='E-mail', callback_data='change_email')
+inl_menuchange_button4 = InlineKeyboardButton(text='Номер телефона', callback_data='change_social_network')
+inl_menuchange_button5 = InlineKeyboardButton(text='Сфера деятельности', callback_data='change_work')
+inl_menuchange_button6 = InlineKeyboardButton(text='Компания', callback_data='change_company')
+inl_menuchange_button7 = InlineKeyboardButton(text='Интересы/Ресурсы/Хобби', callback_data='change_hobby')
+inl_menuchange_button8 = InlineKeyboardButton(text='Формат встреч', callback_data='change_format')
+inl_menuchange_button9 = InlineKeyboardButton(text='Ожидания', callback_data='change_expect')
+inl_menuchange_button10 = InlineKeyboardButton(text='Возраст', callback_data='change_data')
+inl_menuchange_button11 = InlineKeyboardButton(text='Цель', callback_data='change_purpose')
 inl_menuchange_button12 = InlineKeyboardButton(text='Выход', callback_data='change_exit')
 
 kb_menuchange = InlineKeyboardMarkup(resize_keyboard=True).add(inl_menuchange_button1).add(inl_menuchange_button2).add(inl_menuchange_button3)\
@@ -35,37 +35,37 @@ InlineKeyboardButton(text='Онлайн', callback_data='online')).row(inl_butto
 inline_kb_verify = InlineKeyboardMarkup(resize_keyboard=True).row(inl_button2).row(inl_button3)
 inline_kb_succses = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Понятно, дальше ⏩', callback_data='succses')).row(inl_button3)
 
-promo_button = InlineKeyboardButton(text='Есть промокод🌟', callback_data='promocode')
+# promo_button = InlineKeyboardButton(text='Есть промокод🌟', callback_data='promocode')
 
-menu_promo_button = InlineKeyboardButton(text='Есть промокод🌟', callback_data='menu_promocode')
+# menu_promo_button = InlineKeyboardButton(text='Есть промокод🌟', callback_data='menu_promocode')
 
-inline_kb_buy = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Оплатить месяц💵', callback_data='buy_month'))\
-                                                          .row(InlineKeyboardButton(text='Оплатить год💵', callback_data='buy_year'))\
-                                                          .row(InlineKeyboardButton(text='Активировать промокод🌟', callback_data='just_promo'))\
-                                                          .row(InlineKeyboardButton(text='Оплатить позднее🔜', callback_data='buy_later'))
+# inline_kb_buy = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Оплатить месяц💵', callback_data='buy_month'))\
+#                                                           .row(InlineKeyboardButton(text='Оплатить год💵', callback_data='buy_year'))\
+#                                                           .row(InlineKeyboardButton(text='Активировать промокод🌟', callback_data='just_promo'))\
+#                                                           .row(InlineKeyboardButton(text='Оплатить позднее🔜', callback_data='buy_later'))
                                                           
-inline_promo = InlineKeyboardMarkup(resize_keyboard=True).row(promo_button)\
-                                                         .row(InlineKeyboardButton(text='Оплатить сразу', callback_data='buy_now'))\
-                                                         .row(inl_button1)
+# inline_promo = InlineKeyboardMarkup(resize_keyboard=True).row(promo_button)\
+#                                                          .row(InlineKeyboardButton(text='Оплатить сразу', callback_data='buy_now'))\
+#                                                          .row(inl_button1)
 
-inline_kb_menu_buy = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Оплатить месяц💵', callback_data='menu_buy_month'))\
-                                                               .row(InlineKeyboardButton(text='Оплатить год💵', callback_data='menu_buy_year'))\
-                                                               .row(InlineKeyboardButton(text='Назад🔙', callback_data='back_main'))
+# inline_kb_menu_buy = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Оплатить месяц💵', callback_data='menu_buy_month'))\
+#                                                                .row(InlineKeyboardButton(text='Оплатить год💵', callback_data='menu_buy_year'))\
+#                                                                .row(InlineKeyboardButton(text='Назад🔙', callback_data='back_main'))
 
-inline_menu_promo = InlineKeyboardMarkup(resize_keyboard=True).row(menu_promo_button)\
-                                                         .row(InlineKeyboardButton(text='Оплатить сразу', callback_data='buy_now_menu'))\
-                                                         .row(InlineKeyboardButton(text='Назад🔙', callback_data='menu_back'))
+# inline_menu_promo = InlineKeyboardMarkup(resize_keyboard=True).row(menu_promo_button)\
+#                                                          .row(InlineKeyboardButton(text='Оплатить сразу', callback_data='buy_now_menu'))\
+#                                                          .row(InlineKeyboardButton(text='Назад🔙', callback_data='menu_back'))
 
 
-inline_kb_buy_only = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Оплатить', callback_data='buy'))\
-                                                               .row(InlineKeyboardButton(text='Оплатить позднее🔜', callback_data='buy_later'))
+# inline_kb_buy_only = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Оплатить', callback_data='buy'))\
+#                                                                .row(InlineKeyboardButton(text='Оплатить позднее🔜', callback_data='buy_later'))
 
 inline_kb_go = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Поехали 🚀', callback_data='next'))
 
 inline_kb_menu = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Мой профиль📔', callback_data='show_profile'), InlineKeyboardButton(text='Редактировать✏️', callback_data='change_profile'))\
-                                                            .row(InlineKeyboardButton(text='Моя подписка✔️', callback_data='check_paid'), InlineKeyboardButton(text='Оплатить💵', callback_data='buy_sub'))\
-                                                            .row(InlineKeyboardButton(text='Текущая пара💬', callback_data='current_buddy'), InlineKeyboardButton(text='Новая пара🆕', callback_data='get_new_buddy'))\
-                                                            .row(InlineKeyboardButton(text='История встреч🤝', callback_data='get_history'))
+                                                            .row(InlineKeyboardButton(text='Текущая пара💬', callback_data='current_buddy'), InlineKeyboardButton(text='История встреч🤝', callback_data='get_history'))
+                                                            # .row(InlineKeyboardButton(text='История встреч🤝', callback_data='get_history'))
+                                                            # .row(InlineKeyboardButton(text='Моя подписка✔️', callback_data='check_paid'), InlineKeyboardButton(text='Оплатить💵', callback_data='buy_sub'))\
 
 inline_kb_back_menu = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Назад🔙', callback_data='back_main'))
 

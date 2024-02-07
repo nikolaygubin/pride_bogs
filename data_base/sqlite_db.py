@@ -17,18 +17,29 @@ from keyboards.client_kb import (
 
 def start_sql():
     global base, cursor
+    # result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
+    # username = result.username
+    # password = result.password
+    # database = result.path[1:]
+    # hostname = "185.251.89.100"
+    # port = 29280
+
     result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
     username = result.username
     password = result.password
     database = result.path[1:]
-    hostname = "185.251.89.100"
-    port = 29280
+    hostname = result.hostname
+    port = result.port
+
     base = ps.connect(
         port=port, host=hostname, user=username, password=password, database=database
     )
     cursor = base.cursor()
     if base:
         print("Data base connected")
+    
+    # cursor.execute('drop table users')  
+    # base.commit()  
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS users(id BIGINT PRIMARY KEY,\
     tg TEXT, name TEXT, photo TEXT, town TEXT, social_network TEXT, work TEXT,\
@@ -140,6 +151,7 @@ async def insert_sql(state: FSMContext):
         user_data.append("true")
         
     print(user_data)
+    print(len(user_data))
 
     cursor.execute("SELECT * FROM users WHERE id = %s", (user_data[0],))
     user = cursor.fetchone()
@@ -147,7 +159,7 @@ async def insert_sql(state: FSMContext):
         cursor.execute("DELETE FROM users WHERE id = %s", (user[0],))
         base.commit()
     cursor.execute(
-        "INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "INSERT INTO users VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         tuple(user_data),
     )
     base.commit()
@@ -377,8 +389,8 @@ async def is_register(id):
 
 async def get_offline_users():
     cursor.execute(
-        "SELECT id, town FROM users WHERE online = %s and is_sub_active = %s and active = %s",
-        (False, True, True),
+        "SELECT id, town FROM users WHERE online = %s and active = %s",
+        (False, True),
     )
     offline = cursor.fetchall()
     if offline == None:
@@ -388,8 +400,8 @@ async def get_offline_users():
 
 async def get_online_users():
     cursor.execute(
-        "SELECT id, town FROM users WHERE online = %s and is_sub_active = %s and active = %s",
-        (True, True, True),
+        "SELECT id, town FROM users WHERE online = %s and active = %s",
+        (True, True),
     )
     online = cursor.fetchall()
     if online == None:
@@ -432,7 +444,7 @@ async def is_last_pair(id, pair_id):
 
 async def find_users_without_pair():
     cursor.execute(
-        "SELECT id, name online FROM users WHERE array_upper(last_pairs, 1) is null and active = true and is_sub_active = true"
+        "SELECT id, name online FROM users WHERE array_upper(last_pairs, 1) is null and active = true"
     )
     users = cursor.fetchall()
     if users == None:
@@ -441,12 +453,11 @@ async def find_users_without_pair():
     for user in users:
         try:
             await try_make_pair(user[0])
-            await add_one_week(user[0])
         except:
             print("Я в блоке")
             
     cursor.execute(
-        "SELECT id, name online FROM users WHERE array_upper(last_pairs, 1) is null and active = true and is_sub_active = true"
+        "SELECT id, name online FROM users WHERE array_upper(last_pairs, 1) is null and active = true"
     )
     users = cursor.fetchall()
     if users == None:
@@ -457,8 +468,7 @@ async def find_users_without_pair():
             await bot.send_message(
                 user[0],
                 f"Добрый день, {user[1]}!\nКоманда PRIDE_CONNECT приносит извинения, так как \
-на этой неделе нечётное количество пользователей. Но не спешите расстраиваться, мы автоматически подберём вам пару, когда найдём партнёра, подходящего к вашим критерям.\n\n\
-Также мы добавили вам неделю подписки.",
+на этой неделе нечётное количество пользователей. Но не спешите расстраиваться, мы автоматически подберём вам пару, когда найдём партнёра, подходящего к вашим критерям.",
             )
         except:
             print("Я в блоке")
@@ -565,7 +575,7 @@ async def current_buddies(id):
 
 async def get_users():
     cursor.execute(
-        "SELECT id, last_pairs, impress_of_meet FROM users WHERE is_sub_active = true and active = true"
+        "SELECT id, last_pairs, impress_of_meet FROM users WHERE active = true"
     )
     return cursor.fetchall()
 
@@ -618,19 +628,19 @@ async def clear_temp_users():
 
 
 async def active_users():
-    cursor.execute("SELECT * FROM users WHERE active = true and is_sub_active = true")
+    cursor.execute("SELECT * FROM users WHERE active = true")
     return len(cursor.fetchall())
 
 
-# async def get_paid_users():
-#     cursor.execute("SELECT id FROM users where is_sub_active = true")
-#     id_list = []
-#     users = cursor.fetchall()
-#     if users == None:
-#         return []
-#     for user in users:
-#         id_list.append(user[0])
-#     return id_list
+async def get_users_for_is_active():
+    cursor.execute("SELECT id FROM users")
+    id_list = []
+    users = cursor.fetchall()
+    if users == None:
+        return []
+    for user in users:
+        id_list.append(user[0])
+    return id_list
 
 
 async def write_active(active: bool, id: int):
@@ -646,9 +656,9 @@ async def write_active(active: bool, id: int):
 #     return promocodes
 
 
-async def remove_active(id: int):
-    cursor.execute("UPDATE users SET is_sub_active = false WHERE id = %s", (id,))
-    base.commit()
+# async def remove_active(id: int):
+#     cursor.execute("UPDATE users SET is_sub_active = false WHERE id = %s", (id,))
+#     base.commit()
 
 
 # async def update():
@@ -703,7 +713,7 @@ async def get_photo(id):
 
 
 async def check_block():
-    cursor.execute("SELECT id FROM users WHERE is_sub_active = true")
+    cursor.execute("SELECT id FROM users")
     users = cursor.fetchall()
 
     for user in users:
@@ -741,25 +751,25 @@ async def send_maybe_pair(user_id, send_id, text):
         print("Я в блоке")
 
 
-async def add_one_week(id):
-    try:
-        cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
-        user = cursor.fetchone()
+# async def add_one_week(id):
+#     try:
+#         cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
+#         user = cursor.fetchone()
 
-        mas_date = user[15].split("-")
-        date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
-        date += datetime.timedelta(days=7)
-        str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
+#         mas_date = user[15].split("-")
+#         date = datetime.date(int(mas_date[2]), int(mas_date[1]), int(mas_date[0]))
+#         date += datetime.timedelta(days=7)
+#         str_date = str(date.day) + "-" + str(date.month) + "-" + str(date.year)
 
-        cursor.execute(
-            "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
-            (True, str_date, id),
-        )
-        base.commit()
-        await bot.send_message(id, "Данные об оплате успешно записаны!")
-    except Exception as ex:
-        print(ex)
-        await bot.send_message(id, "Не удалось записать данные об оплате!")
+#         cursor.execute(
+#             "UPDATE users SET is_sub_active = %s, date_out_active = %s WHERE id = %s",
+#             (True, str_date, id),
+#         )
+#         base.commit()
+#         await bot.send_message(id, "Данные об оплате успешно записаны!")
+#     except Exception as ex:
+#         print(ex)
+#         await bot.send_message(id, "Не удалось записать данные об оплате!")
 
 
 # async def del_out_promo():

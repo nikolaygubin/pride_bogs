@@ -16,11 +16,11 @@ logging.basicConfig(level=logging.INFO)
     
 async def on_startup(dp):
     sqlite_db.start_sql()
-    scheduler.add_job(del_promo, 'cron', hour='9', minute='0', timezone='Europe/Moscow')
+    # scheduler.add_job(del_promo, 'cron', hour='9', minute='0', timezone='Europe/Moscow')
     scheduler.add_job(make_pairs, 'cron', day_of_week='0', hour='10', minute='0', timezone='Europe/Moscow')
     scheduler.add_job(ask_impress, 'cron', day_of_week='3,5', hour='12', minute='0', timezone='Europe/Moscow')
     scheduler.add_job(is_active, 'cron', day_of_week='6', hour='10', minute='0', timezone='Europe/Moscow')
-    scheduler.add_job(update_paid, 'cron', day_of_week='6', hour='8', minute='0', timezone='Europe/Moscow')
+    # scheduler.add_job(update_paid, 'cron', day_of_week='6', hour='8', minute='0', timezone='Europe/Moscow')
     scheduler.start()
     await bot.set_webhook(os.environ.get('URL'))
 
