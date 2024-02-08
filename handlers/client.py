@@ -169,7 +169,7 @@ async def next_step(callback_query : types.CallbackQuery, state : FSMContext):
         # await Client.expect.set()
         await sqlite_db.load_info(callback_query.from_user.id, state)         
         values = list(await sqlite_db.get_profile(callback_query.from_user.id))
-        age = datetime.datetime.now().year - int(values[10].split('.')[2])
+        age = datetime.datetime.now().year - int(values[11].split('.')[2])
         format = str()
         if values[10]:
             format = 'Онлайн'

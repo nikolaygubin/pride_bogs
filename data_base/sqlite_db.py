@@ -17,19 +17,19 @@ from keyboards.client_kb import (
 
 def start_sql():
     global base, cursor
-    # result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
-    # username = result.username
-    # password = result.password
-    # database = result.path[1:]
-    # hostname = "185.251.89.100"
-    # port = 29280
-
     result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
     username = result.username
     password = result.password
     database = result.path[1:]
-    hostname = result.hostname
-    port = result.port
+    hostname = "185.251.89.100"
+    port = 29280
+
+    # result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
+    # username = result.username
+    # password = result.password
+    # database = result.path[1:]
+    # hostname = result.hostname
+    # port = result.port
 
     base = ps.connect(
         port=port, host=hostname, user=username, password=password, database=database
@@ -566,8 +566,8 @@ async def current_buddies(id):
             format = "Онлайн"
         else:
             format = "Оффлайн"
-        pairs_info += f"{user[2]}({user[4]})\n\nСвязь:\nTelegram: {user[1]}\n{user[5]}\n\nЧем занимается: \
-{user[6]}\n\nЗацепки для начала разговора: {user[7]}\n\nОт встречи ожидает: {user[8]}\nФормат встречи: {format}\n\n"
+        pairs_info += f"{user[2]}({user[4]})\n\nСвязь:\nTelegram: {user[1]}\nНомер телефона: {user[5]}\n\nСфера деятельности: \
+{user[6]}\n\nИнтересы/Ресурсы/ Хобби: {user[8]}\n\nНазвание компании: {user[7]}\n\nОт встречи ожидает: {user[9]}\nФормат встречи: {format}\n\n"
         count += 1
 
     return pairs_info
