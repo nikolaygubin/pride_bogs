@@ -70,6 +70,13 @@ class Menu(StatesGroup):
 async def back(callback_query : types.CallbackQuery, state : FSMContext):
     await callback_query.answer()
     current_state = await state.get_state()
+    async with state.proxy() as data:
+        msg : types.Message = types.Message.to_object(data['Last_message'])
+        try:
+            await msg.edit_reply_markup(None)
+            await msg.delete()
+        except:
+            pass
     if current_state == Client.town.state or current_state == Client.username.state:
         async with state.proxy() as data:    
             msg = await bot.send_message(callback_query.from_user.id, GET_NAME)
