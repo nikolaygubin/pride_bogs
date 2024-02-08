@@ -68,8 +68,8 @@ async def make_pairs():
                         await sqlite_db.append_pair(left_user, town_users[i]) # добавляем пары в базу данных
                         offline_dict[town].remove(town_users[i])
                         offline_dict[town].remove(left_user)
-                        # town_users.remove(left_user)
-                        # town_users.remove(town_users[i])
+                        town_users.remove(left_user)
+                        town_users.remove(town_users[i])
                         break
                         
         offline_size = len(dict_pairs)

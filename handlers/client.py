@@ -94,11 +94,11 @@ async def back(callback_query : types.CallbackQuery, state : FSMContext):
             data['Last_message'] = msg.to_python()
     elif current_state == Client.hooks.state:
         async with state.proxy() as data:
-            msg = await bot.send_message(callback_query.from_user.id, GET_WORK, reply_markup=inline_kb_quest) 
+            msg = await bot.send_message(callback_query.from_user.id, GET_COMPANY, reply_markup=inline_kb_quest) 
             data['Last_message'] = msg.to_python()
     elif current_state == Client.company.state:
         async with state.proxy() as data:
-            msg = await bot.send_message(callback_query.from_user.id, GET_COMPANY, reply_markup=inline_kb_quest) 
+            msg = await bot.send_message(callback_query.from_user.id, GET_WORK, reply_markup=inline_kb_quest) 
             data['Last_message'] = msg.to_python()
     elif current_state == Client.expect.state:
         async with state.proxy() as data:
@@ -257,8 +257,16 @@ async def menu(message : types.Message, state : FSMContext):
 async def help(message : types.Message):
     await message.answer(HELP_MESSAGE)
 
+def is_valid_user(id):
+    return True
+
 # обработка старта бота и получения id
 async def start(message : types.Message, state : FSMContext):
+    
+    is_valid = is_valid_user(message.from_user.id)
+    if (not is_valid):
+        await message.answer('Вам закрыт доступ к сооюществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
+    
     await Client.id.set()
     async with state.proxy() as data:
         user_name = message.from_user.first_name
@@ -1252,6 +1260,10 @@ async def skip(callback_query: types.CallbackQuery, state : FSMContext):
     await callback_query.message.edit_text(f'{callback_query.message.text}\n➡️Пропущу неделю🔜', reply_markup=None)
     
 async def restart(message : types.Message, state : FSMContext):
+    is_valid = is_valid_user(message.from_user.id)
+    if (not is_valid):
+        await message.answer('Вам закрыт доступ к сооюществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
+    
     keyboard = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Перезапуск', callback_data='restart')).row(
                                                               InlineKeyboardButton(text='Отмена', callback_data='cancel'))
     async with state.proxy() as data:
