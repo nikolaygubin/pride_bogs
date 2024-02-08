@@ -43,9 +43,6 @@ async def make_pairs():
         online_users = await sqlite_db.get_online_users() # получаем всех онлайн пользователей (только id)
         dict_pairs = dict(str()) # словарь со всеми парами
 
-        print(offline_users)
-        print(online_users)
-
         offline_dict = {} # инициализируем словарь и заносим туда всех оффлайн пользователей по городам
         for user in offline_users: 
             town = user[1].lower()
@@ -54,120 +51,54 @@ async def make_pairs():
             offline_dict[town].append(user[0])
 
 
-        for town in offline_dict.keys():
-            town_users = list(offline_dict[town])
+#         for town in offline_dict.keys():
+#             town_users = list(offline_dict[town])
             
-            for user_id in town_users:
-                left_user = user_id
-                for i in range(len(town_users)):
-                    if town_users[i] == left_user:
-                        continue
+#             for user_id in town_users:
+#                 left_user = user_id
+#                 for i in range(len(town_users)):
+#                     if town_users[i] == left_user:
+#                         continue
                     
-                    if town_users[i] in dict_pairs.values():
-                        break
+#                     if town_users[i] in dict_pairs.values():
+#                         break
                     
-                    if not await sqlite_db.is_last_pair(left_user, town_users[i]):
-                        dict_pairs[left_user] = town_users[i]
-                        await sqlite_db.append_pair(left_user, town_users[i]) # добавляем пары в базу данных
-                        offline_dict[town].remove(town_users[i])
-                        offline_dict[town].remove(left_user)
-                        town_users.remove(left_user)
-                        town_users.remove(town_users[i])
-                        break
+#                     if not await sqlite_db.is_last_pair(left_user, town_users[i]):
+#                         dict_pairs[left_user] = town_users[i]
+#                         await sqlite_db.append_pair(left_user, town_users[i]) # добавляем пары в базу данных
+#                         offline_dict[town].remove(town_users[i])
+#                         offline_dict[town].remove(left_user)
+#                         town_users.remove(left_user)
+#                         town_users.remove(town_users[i])
+#                         break
                         
-        offline_size = len(dict_pairs)
+#         offline_size = len(dict_pairs)
         
-        online_id = list() # создаём список и добавляем туда все онлайн id
-        for town in offline_dict.keys():
-            users = offline_dict[town]
-            for user in users:
-                online_id.append(user)
+#         online_id = list() # создаём список и добавляем туда все онлайн id
+#         for town in offline_dict.keys():
+#             users = offline_dict[town]
+#             for user in users:
+#                 online_id.append(user)
 
-        for user in online_users:
-            online_id.append(user[0])
+#         for user in online_users:
+#             online_id.append(user[0])
 
-        print(online_id)
+#         print(online_id)
 
-        for user_id in online_id:
-            left_user = user_id
-            for i in range(len(online_id)):
-                if online_id[i] == left_user:
-                    continue
-                if online_id[i] in dict_pairs.values():
-                    break
+#         for user_id in online_id:
+#             left_user = user_id
+#             for i in range(len(online_id)):
+#                 if online_id[i] == left_user:
+#                     continue
+#                 if online_id[i] in dict_pairs.values():
+#                     break
                 
-                if not await sqlite_db.is_last_pair(left_user, online_id[i]):
-                    dict_pairs[left_user] = online_id[i]
-                    await sqlite_db.append_pair(left_user, online_id[i]) # добавляем пары в базу данных
-                    online_users.remove(left_user)
-                    online_users.remove(online_users[i])
-                    break
-
-        count = 0
-        for key, value in dict_pairs.items():
-            if count < offline_size:
-                await send_invoice_message(key, value, 'Поздравляем! Вам нашлась оффлайн пара, советуем договориться о встрече сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
-                await send_invoice_message(value, key, 'Поздравляем! Вам нашлась оффлайн пара, советуем договориться о встрече сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
-            else:
-                await send_invoice_message(key, value, 'Поздравляем! Вам нашлась онлайн пара, советуем написать сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
-                await send_invoice_message(value, key, 'Поздравляем! Вам нашлась онлайн пара, советуем написать сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
-            count += 1
-
-        await dp.bot.send_message(ID[0], f'Подобрано {len(dict_pairs)} пар, из них {offline_size} оффлайн и {len(dict_pairs) - offline_size} онлайн пар!\n\
-Не доставлось пары {(len(offline_users) + len(online_users)) - len(dict_pairs) * 2} пользователям.')
-
-        return len(dict_pairs)
-
-        # for town in offline_dict.keys(): # проходимся по всем городам и пытаемся сформировать пары
-        #     town_id = list(offline_dict[town]) # иницализируем массив с пользователями в городе town
-        #     for id in range(len(town_id)): # пытаемся подобрать пару каждому пользователю
-        #         max_sim = -1    
-        #         max_index = id  # индекс с максимальной схожестью (по умолчанию ссылается на самого себя)
-        #         for pair_id in range(len(town_id)):
-        #             if town_id[id] in dict_pairs.values():
-        #                 break
-        #             if id == pair_id or town_id[pair_id] in dict_pairs.keys() or town_id[pair_id] in dict_pairs.values() or await sqlite_db.is_last_pair(town_id[id], town_id[pair_id]):
-        #                 continue   
-        #             s1 = await sqlite_db.get_hooks(town_id[id])
-        #             s2 = await sqlite_db.get_hooks(town_id[pair_id])
-        #             sim = similarity(s1, s2) # процент схожести 2 строк 
-        #             if sim > max_sim:
-        #                 max_index = pair_id
-        #                 max_sim = sim
-        #         if max_index != id:
-        #             dict_pairs[town_id[id]] = town_id[max_index]
-        #             await sqlite_db.append_pair(town_id[id], town_id[max_index]) # добавляем пары в базу данных
-        #             offline_dict[town].remove(town_id[id])
-        #             offline_dict[town].remove(town_id[max_index])
-
-        # offline_size = len(dict_pairs)
-
-        # online_id = list() # создаём список и добавляем туда все онлайн id
-        # for town in offline_dict.keys():
-        #     users = offline_dict[town]
-        #     for user in users:
-        #         online_id.append(user)
-
-        # for user in online_users:
-        #     online_id.append(user[0])
-
-        # for id in range(len(online_id)):
-        #     max_sim = -1
-        #     max_index = id
-        #     for pair_id in range(len(online_id)):
-        #         if online_id[id] in dict_pairs.values():
-        #             break
-        #         if id == pair_id or online_id[pair_id] in dict_pairs.keys() or online_id[pair_id] in dict_pairs.values() or await sqlite_db.is_last_pair(online_id[id], online_id[pair_id]):
-        #             continue     
-        #         s1 = await sqlite_db.get_hooks(online_id[id])
-        #         s2 = await sqlite_db.get_hooks(online_id[pair_id])
-        #         sim = similarity(s1, s2)
-        #         if sim > max_sim:
-        #             max_index = pair_id
-        #             max_sim = sim
-        #     if max_index != id:
-        #         dict_pairs[online_id[id]] = online_id[max_index]
-        #         await sqlite_db.append_pair(online_id[id], online_id[max_index])
+#                 if not await sqlite_db.is_last_pair(left_user, online_id[i]):
+#                     dict_pairs[left_user] = online_id[i]
+#                     await sqlite_db.append_pair(left_user, online_id[i]) # добавляем пары в базу данных
+#                     online_users.remove(left_user)
+#                     online_users.remove(online_users[i])
+#                     break
 
 #         count = 0
 #         for key, value in dict_pairs.items():
@@ -181,11 +112,77 @@ async def make_pairs():
 
 #         await dp.bot.send_message(ID[0], f'Подобрано {len(dict_pairs)} пар, из них {offline_size} оффлайн и {len(dict_pairs) - offline_size} онлайн пар!\n\
 # Не доставлось пары {(len(offline_users) + len(online_users)) - len(dict_pairs) * 2} пользователям.')
-            
-#         if len(dict_pairs) * 2 != len(offline_users) + len(online_users):
-#             await sqlite_db.find_users_without_pair()
-            
+
 #         return len(dict_pairs)
+
+        for town in offline_dict.keys(): # проходимся по всем городам и пытаемся сформировать пары
+            town_id = list(offline_dict[town]) # иницализируем массив с пользователями в городе town
+            for id in range(len(town_id)): # пытаемся подобрать пару каждому пользователю
+                max_sim = -1    
+                max_index = id  # индекс с максимальной схожестью (по умолчанию ссылается на самого себя)
+                for pair_id in range(len(town_id)):
+                    if town_id[id] in dict_pairs.values():
+                        break
+                    if id == pair_id or town_id[pair_id] in dict_pairs.keys() or town_id[pair_id] in dict_pairs.values() or await sqlite_db.is_last_pair(town_id[id], town_id[pair_id]):
+                        continue   
+                    s1 = await sqlite_db.get_hooks(town_id[id])
+                    s2 = await sqlite_db.get_hooks(town_id[pair_id])
+                    sim = similarity(s1, s2) # процент схожести 2 строк 
+                    if sim > max_sim:
+                        max_index = pair_id
+                        max_sim = sim
+                if max_index != id:
+                    dict_pairs[town_id[id]] = town_id[max_index]
+                    await sqlite_db.append_pair(town_id[id], town_id[max_index]) # добавляем пары в базу данных
+                    offline_dict[town].remove(town_id[id])
+                    offline_dict[town].remove(town_id[max_index])
+
+        offline_size = len(dict_pairs)
+
+        online_id = list() # создаём список и добавляем туда все онлайн id
+        for town in offline_dict.keys():
+            users = offline_dict[town]
+            for user in users:
+                online_id.append(user)
+
+        for user in online_users:
+            online_id.append(user[0])
+
+        for id in range(len(online_id)):
+            max_sim = -1
+            max_index = id
+            for pair_id in range(len(online_id)):
+                if online_id[id] in dict_pairs.values():
+                    break
+                if id == pair_id or online_id[pair_id] in dict_pairs.keys() or online_id[pair_id] in dict_pairs.values() or await sqlite_db.is_last_pair(online_id[id], online_id[pair_id]):
+                    continue     
+                s1 = await sqlite_db.get_hooks(online_id[id])
+                s2 = await sqlite_db.get_hooks(online_id[pair_id])
+                sim = similarity(s1, s2)
+                if sim > max_sim:
+                    max_index = pair_id
+                    max_sim = sim
+            if max_index != id:
+                dict_pairs[online_id[id]] = online_id[max_index]
+                await sqlite_db.append_pair(online_id[id], online_id[max_index])
+
+        count = 0
+        for key, value in dict_pairs.items():
+            if count < offline_size:
+                await send_invoice_message(key, value, 'Поздравляем! Вам нашлась оффлайн пара, советуем договориться о встрече сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
+                await send_invoice_message(value, key, 'Поздравляем! Вам нашлась оффлайн пара, советуем договориться о встрече сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
+            else:
+                await send_invoice_message(key, value, 'Поздравляем! Вам нашлась онлайн пара, советуем написать сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
+                await send_invoice_message(value, key, 'Поздравляем! Вам нашлась онлайн пара, советуем написать сразу, приятного общения🤝\nВы можете начать знакомство с этой фразы : «Привет! Я из приложения PRIDE CONNECT) Ты мой собеседник на этой неделе\n\n У тебя как по времени на неделе? Давай созвонимся / встретимся?»')
+            count += 1
+
+        await dp.bot.send_message(ID[0], f'Подобрано {len(dict_pairs)} пар, из них {offline_size} оффлайн и {len(dict_pairs) - offline_size} онлайн пар!\n\
+Не доставлось пары {(len(offline_users) + len(online_users)) - len(dict_pairs) * 2} пользователям.')
+            
+        if len(dict_pairs) * 2 != len(offline_users) + len(online_users):
+            await sqlite_db.find_users_without_pair()
+            
+        return len(dict_pairs)
 
     # except Exception:
     #     await dp.bot.send_message(555581588, 'Возникла ошибка при подборе пар')
