@@ -22,7 +22,6 @@ async def on_startup(dp):
     scheduler.add_job(is_active, 'cron', day_of_week='6', hour='10', minute='0', timezone='Europe/Moscow')
     # scheduler.add_job(update_paid, 'cron', day_of_week='6', hour='8', minute='0', timezone='Europe/Moscow')
     scheduler.start()
-    print(os.getenv('URL'))
     await bot.set_webhook(os.getenv('URL'))
 
 async def on_shutdown(dp):
@@ -32,15 +31,15 @@ async def on_shutdown(dp):
     
 
 if __name__ == "__main__" :
-    executor.start_webhook(
-        dispatcher = dp,
-        webhook_path = '',
-        skip_updates = True,
-        on_startup = on_startup,
-        on_shutdown = on_shutdown,
-        host = "0.0.0.0",
-        port = int(os.environ.get("PORT", 5000))
-    )
-    # sqlite_db.start_sql()
-    # executor.start_polling(dp, skip_updates=False)
+    # executor.start_webhook(
+    #     dispatcher = dp,
+    #     webhook_path = '',
+    #     skip_updates = True,
+    #     on_startup = on_startup,
+    #     on_shutdown = on_shutdown,
+    #     host = "0.0.0.0",
+    #     port = int(os.environ.get("PORT", 5000))
+    # )
+    sqlite_db.start_sql()
+    executor.start_polling(dp, skip_updates=False)
 
