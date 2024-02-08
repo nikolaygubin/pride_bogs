@@ -175,8 +175,7 @@ async def next_step(callback_query : types.CallbackQuery, state : FSMContext):
             format = 'Онлайн'
         else :
             format = 'Оффлайн'
-        card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
-        {values[6]}\n\nИнтересы/Ресурсы/ Хобби: {values[8]}\n\nНазвание компании: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[12]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[9]}'      
+        card = f'{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: {values[6]}\n\nИнтересы/Ресурсы/ Хобби: {values[8]}\n\nНазвание компании: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[12]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[9]}'      
         async with state.proxy() as data:
             msg = await bot.send_message(callback_query.from_user.id, TEXT_PROFILE + card, reply_markup=inline_kb_succses)
             data['Last_message'] = msg.to_python()
@@ -403,7 +402,10 @@ async def get_social_network(message : types.Message, state : FSMContext):
 
         data['Номер телефона'] = phone_number
         msg = types.Message.to_object(data['Last_message'])
-        await msg.delete_reply_markup()
+        try:
+            await msg.delete_reply_markup()
+        except:
+            pass
         msg = await message.answer(GET_WORK, reply_markup=inline_kb_quest)
         data['Last_message'] = msg.to_python()
     await Client.next()
