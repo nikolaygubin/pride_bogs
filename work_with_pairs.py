@@ -63,13 +63,16 @@ async def make_pairs():
                     if town_users[i] == left_user:
                         continue
                     
+                    if town_users[i] in dict_pairs.values():
+                        break
+                    
                     if not await sqlite_db.is_last_pair(left_user, town_users[i]):
                         dict_pairs[left_user] = town_users[i]
                         await sqlite_db.append_pair(left_user, town_users[i]) # добавляем пары в базу данных
                         offline_dict[town].remove(town_users[i])
                         offline_dict[town].remove(left_user)
-                        town_users.remove(left_user)
-                        town_users.remove(town_users[i])
+                        # town_users.remove(left_user)
+                        # town_users.remove(town_users[i])
                         break
                         
         offline_size = len(dict_pairs)
@@ -90,12 +93,14 @@ async def make_pairs():
             for i in range(len(online_id)):
                 if online_id[i] == left_user:
                     continue
+                if online_id[i] in dict_pairs.values():
+                    break
                 
                 if not await sqlite_db.is_last_pair(left_user, online_id[i]):
                     dict_pairs[left_user] = online_id[i]
                     await sqlite_db.append_pair(left_user, online_id[i]) # добавляем пары в базу данных
-                    # online_users.remove(left_user)
-                    # online_users.remove(online_users[i])
+                    online_users.remove(left_user)
+                    online_users.remove(online_users[i])
                     break
 
         count = 0
