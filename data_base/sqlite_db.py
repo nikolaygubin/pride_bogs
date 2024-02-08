@@ -17,19 +17,19 @@ from keyboards.client_kb import (
 
 def start_sql():
     global base, cursor
-    result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
-    username = result.username
-    password = result.password
-    database = result.path[1:]
-    hostname = "185.251.89.100"
-    port = 29280
-
     # result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
     # username = result.username
     # password = result.password
     # database = result.path[1:]
-    # hostname = result.hostname
-    # port = result.port
+    # hostname = "185.251.89.100"
+    # port = 29280
+
+    result = urlparse(os.getenv("DATABASE_URL"))
+    username = result.username
+    password = result.password
+    database = result.path[1:]
+    hostname = result.hostname
+    port = result.port
 
     base = ps.connect(
         port=port, host=hostname, user=username, password=password, database=database
