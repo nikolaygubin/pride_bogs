@@ -73,9 +73,9 @@ async def update_username(id, tg):
     if len(user_tg) == 0:
         return
 
-    await bot.send_message(ID[0], f'{user_tg}   {tg}')
+    await bot.send_message(ID[0], f'{user_tg[0]}   {tg}')
 
-    if tg != user_tg:
+    if tg != user_tg[0]:
         cursor.execute("UPDATE users SET tg = %s WHERE id = %s", (tg, id, ))
         base.commit()
         cursor.execute("INSERT INTO allow_users VALUES(%s)", (tg, ))
