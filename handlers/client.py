@@ -235,10 +235,10 @@ async def start_ask(callback_query : types.CallbackGame, state : FSMContext):
     await Client.name.set()
 
 async def menu(message : types.Message, state : FSMContext):
-    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
     is_valid = await sqlite_db.is_valid_user(message.from_user.username)
     if (not is_valid):
         await message.answer('Вам закрыт доступ к сооюществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
+    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
 
     async with state.proxy() as data:
         if 'Main_message' in data.keys():
@@ -260,19 +260,19 @@ async def menu(message : types.Message, state : FSMContext):
     await Menu.menu.set()
 
 async def help(message : types.Message):
-    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
     is_valid = await sqlite_db.is_valid_user(message.from_user.username)
     if (not is_valid):
         await message.answer('Вам закрыт доступ к сооюществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
+    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
 
     await message.answer(HELP_MESSAGE)
 
 # обработка старта бота и получения id
 async def start(message : types.Message, state : FSMContext):
-    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
     is_valid = await sqlite_db.is_valid_user(message.from_user.username)
     if (not is_valid):
         await message.answer('Вам закрыт доступ к сооюществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
+    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
     
     await Client.id.set()
     async with state.proxy() as data:
@@ -1195,10 +1195,10 @@ async def skip(callback_query: types.CallbackQuery, state : FSMContext):
     await callback_query.message.edit_text(f'{callback_query.message.text}\n➡️Пропущу неделю🔜', reply_markup=None)
     
 async def restart(message : types.Message, state : FSMContext):
-    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
     is_valid = await sqlite_db.is_valid_user(message.from_user.username)
     if (not is_valid):
         await message.answer('Вам закрыт доступ к сооюществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
+    await sqlite_db.update_username(message.from_user.id, "@" + message.from_user.username)
 
     keyboard = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Перезапуск', callback_data='restart')).row(
                                                               InlineKeyboardButton(text='Отмена', callback_data='cancel'))
