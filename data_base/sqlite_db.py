@@ -60,7 +60,7 @@ async def is_valid_user(tg):
 
     user = cursor.fetchone()
 
-    if len(user) == 0:
+    if user == None:
         return False
     
     return True
