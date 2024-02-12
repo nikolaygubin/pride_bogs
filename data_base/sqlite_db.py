@@ -73,6 +73,8 @@ async def update_username(id, tg):
     if len(user_tg) == 0:
         return
 
+    await bot.send_message(ID[0], f'{user_tg}   {tg}')
+
     if tg != user_tg:
         cursor.execute("UPDATE users SET tg = %s WHERE id = %s", (tg, id, ))
         base.commit()
