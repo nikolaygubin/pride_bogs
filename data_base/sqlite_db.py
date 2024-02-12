@@ -14,16 +14,8 @@ from keyboards.client_kb import (
     inline_kb_back_menu,
 )
 
-
 def start_sql():
     global base, cursor
-    # result = urlparse("postgres://postgres:9b5922533fc0c3b86eed534d9dc6cdf6@dokku-postgres-artur:5432/artur")
-    # username = result.username
-    # password = result.password
-    # database = result.path[1:]
-    # hostname = "185.251.89.100"
-    # port = 29280
-
     result = urlparse(os.getenv("DATABASE_URL"))
     username = result.username
     password = result.password
@@ -63,70 +55,29 @@ def start_sql():
 async def close_db():
     base.close()
 
+async def is_valid_user(tg):
+    cursor.execute("SELECT * from allow_users where tg = %s", ("@" + tg, ))
 
-# async def check_promo(message: types.Message):
-#     cursor.execute("SELECT * FROM promo WHERE code = %s", (message.text,))
-#     promo = cursor.fetchone()
-#     if promo == None:
-#         # await message.answer('Введённый промокод не найден!')
-#         return 0
-#     if promo[2] < 1:
-#         # await message.answer('Введённый промокод закончился!')
-#         cursor.execute("DELETE FROM promo WHERE code = %s", (promo[0],))
-#         base.commit()
-#         return 0
-#     for id in promo[3]:
-#         if id == message.from_user.id:
-#             await message.answer("Вы уже активировали этот промокод ранее!")
-#             return 0
+    user = cursor.fetchone()
 
-#     cursor.execute(
-#         "UPDATE promo SET count = %s, active_id = array_append(active_id, %s) WHERE code = %s",
-#         (promo[2] - 1, message.from_user.id, promo[0]),
-#     )
-#     base.commit()
-#     # await message.answer(f'Размер скидки введённого промокода равен {promo[1]}%!')
-#     return promo[1]
+    if len(user) == 0:
+        return False
+    
+    return True
 
+async def update_username(id, tg):
+    cursor.execute("SELECT tg from users where id = %s", (id, ))
 
-# async def insert_promo(message: types.Message):
-#     array_values = message.text.split(" ")
-#     array_values.append("{ }")
-#     if len(array_values) != 5 or int(array_values[1]) < 0:
-#         return "Промокод введён некорректно!"
+    user_tg = cursor.fetchone()
 
-#     cursor.execute("SELECT code FROM promo")
-#     codes = []
-#     promo = cursor.fetchall()
-#     for code in promo:
-#         codes.append(code[0])
-#     if array_values[0] in codes:
-#         return "Промокод был добавлен ранее!"
-#     else:
-#         date = datetime.datetime.now().date()
-#         date += datetime.timedelta(days=30 * int(array_values[3]))
-#         cursor.execute(
-#             "INSERT INTO promo VALUES (%s, %s, %s, %s, %s)",
-#             (
-#                 array_values[0],
-#                 array_values[1],
-#                 array_values[2],
-#                 array_values[4],
-#                 str(date),
-#             ),
-#         )
-#         base.commit()
-#         return "Промокод успешно добавлен!"
+    if len(user_tg) == 0:
+        return
 
-
-# async def remove_promo(message: types.Message):
-#     cursor.execute("SELECT * FROM promo WHERE code = %s", (message.text,))
-#     if cursor.fetchone() == None:
-#         return "Удаляемый промокод не найден"
-#     cursor.execute("DELETE FROM promo WHERE code = %s", (message.text,))
-#     base.commit()
-#     return "Промокод успешно удалён!"
-
+    if tg != user_tg[0]:
+        cursor.execute("UPDATE users SET tg = %s WHERE id = %s", (tg, id, ))
+        base.commit()
+        cursor.execute("INSERT INTO allow_users VALUES(%s)", (tg, ))
+        base.commit()
 
 async def insert_sql(state: FSMContext):
     user_data = list()
