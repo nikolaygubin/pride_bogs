@@ -73,7 +73,7 @@ async def update_username(id, tg):
     if len(user_tg) == 0:
         return
 
-    if tg != user_tg[0]:
+    if tg != user_tg:
         cursor.execute("UPDATE users SET tg = %s WHERE id = %s", (tg, id, ))
         base.commit()
         cursor.execute("INSERT INTO allow_users VALUES(%s)", (tg, ))
