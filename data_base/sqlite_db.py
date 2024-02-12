@@ -66,14 +66,12 @@ async def is_valid_user(tg):
     return True
 
 async def update_username(id, tg):
-    cursor.execute("SELECT tg from users where id = %s", (id, ))
+    cursor.execute("SELECT tg from allow_users where id = %s", (id, ))
 
     user_tg = cursor.fetchone()
 
     if len(user_tg) == 0:
         return
-
-    await bot.send_message(ID[0], f'{user_tg[0]}   {tg}')
 
     if tg != user_tg[0]:
         cursor.execute("UPDATE users SET tg = %s WHERE id = %s", (tg, id, ))
