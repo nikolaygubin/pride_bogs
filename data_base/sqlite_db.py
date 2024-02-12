@@ -70,7 +70,7 @@ async def update_username(id, tg):
 
     user_tg = cursor.fetchone()
 
-    if len(user_tg) == 0:
+    if user_tg == None:
         return
 
     if tg != user_tg[0]:
