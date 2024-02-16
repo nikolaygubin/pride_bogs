@@ -12,6 +12,8 @@ import work_with_pairs
 from aiogram.dispatcher.webhook import SendMessage
 
 ID = [555581588, 261295913, 5446068361, 2137624598,1327107969]
+
+ALLOW_TG_ADD_USERS = ["baribeshnik", "Solomatinadesign"]
                 
 inline_kb_panel = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Статистика', callback_data='statistics')).add(
                 InlineKeyboardButton(text='Действия', callback_data='actives')).add(
@@ -49,10 +51,9 @@ class Admin(StatesGroup):
     
     actions = State()
     action_point = State()
-    # del_promo = State()
-    
-    # promocodes = State()
-    # promo_point = State()
+
+    add_user = State()
+    get_user = State()
 
 
 async def admin_panel(message : types.Message, state : FSMContext):    
@@ -271,34 +272,37 @@ async def actions_menu(callback_query : types.CallbackQuery, state : FSMContext)
         await msg.edit_text('Действия', reply_markup=inline_kb_actions)
     await Admin.actions.set()
     
-# async def del_promo(callback_query : types.CallbackQuery, state : FSMContext):
-#     await callback_query.answer()
-#     async with state.proxy() as data:
-#         msg = types.Message.to_object(data['Admin_message']) 
-#         await msg.edit_text('Введите название удаляемого промокода!', reply_markup=inline_kb_back_promo)
-#     await Admin.del_promo.set()
+async def add_user(message : types.Message, state : FSMContext):
+
+    if not message.from_user.username in ALLOW_TG_ADD_USERS:
+        try:
+            await message.delete()
+        except:
+            pass
+        return
     
-# async def get_del_promo(message : types.Message, state : FSMContext):
-#     return_str = await sqlite_db.remove_promo(message)
-#     await message.delete()
-#     async with state.proxy() as data:
-#         msg = types.Message.to_object(data['Admin_message'])
-#         await msg.edit_text(return_str, reply_markup=inline_kb_promo)
-#     await Admin.promocodes.set()    
+    await message.answer("Напиши юзернейм пользователя, которого хочешь добавить\n\n Отправь только последовательность символов без @ или https://t.me/\n\nПример: baribeshinik")
     
-     
-        
+    await Admin.add_user.set()
+
+async def get_user(message : types.Message, state : FSMContext):
+    await sqlite_db.add_user_to_allow(message.from_user.username)
+    await message.answer(f"пользователь с ником {message.from_user.username} успешно добавлен!\n\nДля того чтобы ещё раз добавить пользователя напиши /add")
+
+    await Admin.start.set()    
+
 def register_handlers_admin(dp : Dispatcher):
     dp.register_message_handler(admin_panel, Text(equals='/admin', ignore_case=True), state='*') # main panel
     
+    # panel to add user
+    dp.register_message_handler(add_user, Text(equals='/add', ignore_case=True), state='*')
+    dp.register_message_handler(get_user, state=Admin.add_user)
+
     dp.register_callback_query_handler(statistics_menu, Text(equals='statistics', ignore_case=True), state=Admin.start) # statistics_menu
     dp.register_callback_query_handler(back_stat, Text(equals='back_stat', ignore_case=True), state=Admin.stat_point)  
     dp.register_callback_query_handler(count_users, Text(equals='count_users', ignore_case=True), state=Admin.statistics)
     dp.register_callback_query_handler(count_users_town, Text(equals='count_users_town', ignore_case=True), state=Admin.statistics)
-    # dp.register_callback_query_handler(paid_users, Text(equals='paid_users', ignore_case=True), state=Admin.statistics)
-    # dp.register_callback_query_handler(demo_users, Text(equals='demo_users', ignore_case=True), state=Admin.statistics)
-    dp.register_callback_query_handler(active_users, Text(equals='active_users', ignore_case=True), state=Admin.statistics) 
-    # dp.register_callback_query_handler(see_ref, Text(equals='refs', ignore_case=True), state=Admin.statistics)    
+    dp.register_callback_query_handler(active_users, Text(equals='active_users', ignore_case=True), state=Admin.statistics)
     
     dp.register_callback_query_handler(actions_menu, Text(equals='actives', ignore_case=True), state=Admin.start) # actions_menu
     dp.register_callback_query_handler(back_act, Text(equals='back_act', ignore_case=True), state=Admin.action_point)
@@ -309,17 +313,6 @@ def register_handlers_admin(dp : Dispatcher):
     # dp.register_callback_query_handler(see_paid, Text(equals='see_active', ignore_case=True), state='*')
     dp.register_callback_query_handler(ask_impress_admin, Text(equals='ask_impress_admin', ignore_case=True), state='*')
     dp.register_message_handler(get_message, state=Admin.action_point)
-
-    
-    # dp.register_callback_query_handler(promocodes_menu, Text(equals='promocodes', ignore_case=True), state=Admin.start) # promo_menu
-    # dp.register_callback_query_handler(show_promo, Text(equals='show_promo', ignore_case=True), state='*')
-    # dp.register_callback_query_handler(add_promo, Text(equals='add_promo', ignore_case=True), state='*')
-    # dp.register_message_handler(get_promo, state=Admin.promo_point)
-    # dp.register_callback_query_handler(del_promo, Text(equals='del_promo', ignore_case=True), state='*')
-    # dp.register_message_handler(get_del_promo, state=Admin.del_promo)
-    # dp.register_callback_query_handler(back_promo, Text(equals='back_promo', ignore_case=True), state='*')
-    
-    
     
     dp.register_callback_query_handler(back_main, Text(equals='back_admin_main', ignore_case=True), state='*')
     dp.register_callback_query_handler(close_admin_panel, Text(equals='close', ignore_case=True), state=Admin.start) # close

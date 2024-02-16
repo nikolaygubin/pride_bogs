@@ -79,6 +79,16 @@ async def update_username(id, tg):
         cursor.execute("INSERT INTO allow_users VALUES(%s)", (tg, ))
         base.commit()
 
+async def add_user_to_allow(username):
+    cursor.execute("SELECT * from allow_users WHERE tg = (%s)", (f'@{username}',))
+
+    if cursor.fetchone() != None:
+        return
+
+    cursor.execute("INSERT INTO allow_users VALUES(%s)", (f"@{username}", ))
+    base.commit()
+
+
 async def insert_sql(state: FSMContext):
     user_data = list()
     async with state.proxy() as data:
