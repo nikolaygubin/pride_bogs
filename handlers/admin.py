@@ -219,8 +219,8 @@ async def get_user(message : types.Message, state : FSMContext):
         await Admin.start.set()  
         return
     
-    await sqlite_db.add_user_to_allow(message.from_user.username)
-    await message.answer(f"пользователь с ником {message.from_user.username} успешно добавлен!\n\nДля того чтобы ещё раз добавить пользователя напиши /add")
+    await sqlite_db.add_user_to_allow(message.text)
+    await message.answer(f"пользователь с ником {message.text} успешно добавлен!\n\nДля того чтобы ещё раз добавить пользователя напиши /add")
 
     await Admin.start.set()    
 
