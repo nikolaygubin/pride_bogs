@@ -208,11 +208,17 @@ async def add_user(message : types.Message, state : FSMContext):
             pass
         return
     
-    await message.answer("Напиши юзернейм пользователя, которого хочешь добавить\n\n Отправь только последовательность символов без @ или https://t.me/\n\nПример: baribeshinik")
+    await message.answer("Напиши юзернейм пользователя, которого хочешь добавить\n\n Отправь только последовательность символов без @ или https://t.me/\n\nПример: baribeshinik\n\n\
+Если хочешь отменить операцию напиши мне слово 'Отмена' с большой буквы -> занесение будет прервано")
     
     await Admin.add_user.set()
 
 async def get_user(message : types.Message, state : FSMContext):
+    if message.text == "Отмена":
+        await message.answer("Операция прервана!\n\nНапиши /add для добавления пользователя в таблицу разрешённых юзеров!")
+        await Admin.start.set()  
+        return
+    
     await sqlite_db.add_user_to_allow(message.from_user.username)
     await message.answer(f"пользователь с ником {message.from_user.username} успешно добавлен!\n\nДля того чтобы ещё раз добавить пользователя напиши /add")
 
