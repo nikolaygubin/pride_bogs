@@ -845,7 +845,7 @@ async def show_profile(callback_query : types.CallbackQuery, state = FSMContext)
     born_date = datetime.datetime(year=int(date[2]), month=int(date[1]), day=int(date[0]))
     delta = datetime.datetime.now() - born_date
 
-    age = datetime.datetime(second=delta.total_seconds()).year
+    age = datetime.datetime(second=delta.total_seconds())
     
     format = str()
     if values[10]:
@@ -853,7 +853,7 @@ async def show_profile(callback_query : types.CallbackQuery, state = FSMContext)
     else :
         format = 'Оффлайн'
     card = f'Вот так будет выглядеть твой профиль в сообщении,\
-которое мы пришлем твоему собеседнику:\n⏬\n\n{values[2]} из города {values[4]}\nВозраст: {age}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
+которое мы пришлем твоему собеседнику:\n⏬\n\n{values[2]} из города {values[4]}\nВозраст: {age.year}\n\nTelegram: {values[1]}\nНомер телефона: {values[5]}\n\nСфера деятельности: \
 {values[6]}\n\nИнтересы/Ресурсы/ Хобби: {values[8]}\n\nНазвание компании: {values[7]}\n\nЦель использования PRIDE CONNECT: {values[12]}\n\nФормат встречи: {format}\nОт встречи ожидает: {values[9]}'        
 
     async with state.proxy() as data:
