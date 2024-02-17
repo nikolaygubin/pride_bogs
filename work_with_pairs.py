@@ -14,7 +14,10 @@ def similarity(s1, s2):
 
 async def send_invoice_message(user_id, send_id, text):
     values = list(await sqlite_db.get_profile(user_id))
-    age = datetime.datetime.now().year - int(values[11].split('.')[2])
+    date = values[11].split('.')
+    born_date = datetime.datetime(year=int(date[2]), month=int(date[1]), day=int(date[0]))
+    delta = datetime.datetime.now() - born_date
+    age = delta.days // 365
     format = str()
     if values[10]:
         format = 'Онлайн'

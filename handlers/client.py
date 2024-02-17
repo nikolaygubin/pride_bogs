@@ -176,7 +176,10 @@ async def next_step(callback_query : types.CallbackQuery, state : FSMContext):
         # await Client.expect.set()
         await sqlite_db.load_info(callback_query.from_user.id, state)         
         values = list(await sqlite_db.get_profile(callback_query.from_user.id))
-        age = datetime.datetime.now().year - int(values[11].split('.')[2])
+        date = values[11].split('.')
+        born_date = datetime.datetime(year=int(date[2]), month=int(date[1]), day=int(date[0]))
+        delta = datetime.datetime.now() - born_date
+        age = delta.days // 365
         format = str()
         if values[10]:
             format = 'Онлайн'
@@ -573,7 +576,10 @@ async def get_male(callback_query : types.CallbackQuery, state : FSMContext):
         data['Last_message'] = msg.to_python()
     await sqlite_db.insert_sql(state)
     values = list(await sqlite_db.get_profile(callback_query.from_user.id))
-    age = datetime.datetime.now().year - int(values[11].split('.')[2])
+    date = values[11].split('.')
+    born_date = datetime.datetime(year=int(date[2]), month=int(date[1]), day=int(date[0]))
+    delta = datetime.datetime.now() - born_date
+    age = delta.days // 365
     format = str()
     if values[10]:
         format = 'Онлайн'
@@ -594,7 +600,10 @@ async def get_female(callback_query : types.CallbackQuery, state : FSMContext):
         data['Last_message'] = msg.to_python()
     await sqlite_db.insert_sql(state)
     values = list(await sqlite_db.get_profile(callback_query.from_user.id))
-    age = datetime.datetime.now().year - int(values[11].split('.')[2])
+    date = values[11].split('.')
+    born_date = datetime.datetime(year=int(date[2]), month=int(date[1]), day=int(date[0]))
+    delta = datetime.datetime.now() - born_date
+    age = delta.days // 365
     format = str()
     if values[10]:
         format = 'Онлайн'
@@ -844,9 +853,7 @@ async def show_profile(callback_query : types.CallbackQuery, state = FSMContext)
     date = values[11].split('.')
     born_date = datetime.datetime(year=int(date[2]), month=int(date[1]), day=int(date[0]))
     delta = datetime.datetime.now() - born_date
-
     age = delta.days // 365
-    
     format = str()
     if values[10]:
         format = 'Онлайн'
