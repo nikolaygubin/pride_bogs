@@ -13,7 +13,7 @@ from aiogram.dispatcher.webhook import SendMessage
 
 ID = [555581588, 261295913, 5446068361, 2137624598,1327107969]
 
-ALLOW_TG_ADD_USERS = ["baribeshnik", "Solomatinadesign"]
+ALLOW_TG_ADD_USERS = ["baribeshnik", "ykbreeze"]
                 
 inline_kb_panel = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Статистика', callback_data='statistics')).add(
                 InlineKeyboardButton(text='Действия', callback_data='actives')).add(
