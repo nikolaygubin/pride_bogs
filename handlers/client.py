@@ -841,7 +841,12 @@ async def show_profile(callback_query : types.CallbackQuery, state = FSMContext)
     await callback_query.answer()
     await sqlite_db.load_info(callback_query.from_user.id, state)
     values = list(await sqlite_db.get_profile(callback_query.from_user.id))
-    age = datetime.datetime.now().year - int(values[11].split('.')[2])
+    date = values[11].split('.')
+    born_date = datetime.datetime(year=int(date[2]), month=int(date[1]), day=int(date[0]))
+    delta = datetime.datetime.now() - born_date
+
+    age = datetime.datetime(second=delta.total_seconds()).year
+    
     format = str()
     if values[10]:
         format = 'Онлайн'
