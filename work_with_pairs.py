@@ -39,19 +39,19 @@ async def send_invoice_message(user_id, send_id, text):
         print('Я в блоке')
     
 async def make_pairs():
-        await sqlite_db.check_block()
-        await sqlite_db.clear_temp_users()
-        await sqlite_db.delete_current_pairs()
-        offline_users = await sqlite_db.get_offline_users() # получаем всех оффлайн пользователей (id + town)
-        online_users = await sqlite_db.get_online_users() # получаем всех онлайн пользователей (только id)
-        dict_pairs = dict(str()) # словарь со всеми парами
+        # await sqlite_db.check_block()
+        # await sqlite_db.clear_temp_users()
+        # await sqlite_db.delete_current_pairs()
+        # offline_users = await sqlite_db.get_offline_users() # получаем всех оффлайн пользователей (id + town)
+        # online_users = await sqlite_db.get_online_users() # получаем всех онлайн пользователей (только id)
+        # dict_pairs = dict(str()) # словарь со всеми парами
 
-        offline_dict = {} # инициализируем словарь и заносим туда всех оффлайн пользователей по городам
-        for user in offline_users: 
-            town = user[1].lower()
-            if offline_dict.get(town) == None:
-                offline_dict[town] = list()
-            offline_dict[town].append(user[0])
+        # offline_dict = {} # инициализируем словарь и заносим туда всех оффлайн пользователей по городам
+        # for user in offline_users: 
+        #     town = user[1].lower()
+        #     if offline_dict.get(town) == None:
+        #         offline_dict[town] = list()
+        #     offline_dict[town].append(user[0])
 
 
 #         for town in offline_dict.keys():

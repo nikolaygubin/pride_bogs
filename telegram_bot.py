@@ -31,8 +31,10 @@ async def on_shutdown(dp):
 
 async def on_startup_polling(dp):
     sqlite_db.start_sql()
-    scheduler.add_job(make_pairs, 'cron', day_of_week='0', hour='10', minute='0', timezone='Europe/Moscow')
-    scheduler.add_job(ask_impress, 'cron', day_of_week='3,5', hour='12', minute='0', timezone='Europe/Moscow')
+    scheduler.add_job(make_pairs, 'cron', day_of_week='3', hour='8', minute='0', timezone='Europe/Moscow')
+    scheduler.add_job(ask_impress, 'cron', day_of_week='5', hour='12', minute='0', timezone='Europe/Moscow')
+    # scheduler.add_job(make_pairs, 'cron', day_of_week='0', hour='10', minute='0', timezone='Europe/Moscow')
+    # scheduler.add_job(ask_impress, 'cron', day_of_week='3,5', hour='12', minute='0', timezone='Europe/Moscow')
     scheduler.add_job(is_active, 'cron', day_of_week='6', hour='10', minute='0', timezone='Europe/Moscow')
     scheduler.start()
 
