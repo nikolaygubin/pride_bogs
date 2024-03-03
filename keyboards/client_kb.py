@@ -69,10 +69,12 @@ inline_kb_menu = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardBu
 
 inline_kb_back_menu = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Назад🔙', callback_data='back_main'))
 
-inline_kb_impress = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Отлично✅', callback_data='nice'),
-                                                                   InlineKeyboardButton(text='Не понравилось🙅‍♂️', callback_data='bad')).row(
-                                                                   InlineKeyboardButton(text='Пока не встретились🔜', callback_data='not_meet'))
+# inline_kb_impress = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Отлично✅', callback_data='nice'),
+#                                                                    InlineKeyboardButton(text='Не понравилось🙅‍♂️', callback_data='bad')).row(
+#                                                                    InlineKeyboardButton(text='Пока не встретились🔜', callback_data='not_meet'))
                                                                    
+inline_kb_impress = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Отлично✅', callback_data='nice'),
+                                                                   InlineKeyboardButton(text='Пока не встретились🔜', callback_data='not_meet'))
                                                         
 inline_kb_active = InlineKeyboardMarkup(resize_keyboard=True).row(InlineKeyboardButton(text='Конечно✅', callback_data='active_user'),
                                                                    InlineKeyboardButton(text='Пропущу неделю🔜', callback_data='skip_week'))

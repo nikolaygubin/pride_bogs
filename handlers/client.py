@@ -878,56 +878,6 @@ async def change_profile(callback_query : types.CallbackQuery, state : FSMContex
     await sqlite_db.load_info(callback_query.from_user.id, state)
     # await Menu.next()
 
-# async def check_paid(callback_query : types.CallbackQuery, state : FSMContext):
-#     await callback_query.answer()
-#     date = await sqlite_db.check_paid(callback_query.from_user.id)
-#     async with state.proxy() as data:
-#         if date[0] == 1:
-#             paid_date = date[1].split('-')
-#             month_dict = {1 : 'Января', 2 : 'Февраля', 3 : 'Марта', 4 : 'Апреля', 5 : 'Мая',
-#                           6 : 'Июня', 7 : 'Июля', 8 : 'Августа', 9 : 'Сенятбря', 10 : 'Октября',
-#                           11 : 'Ноября', 12 : 'Декабря'}    
-#             msg = types.Message.to_object(data['Main_message'])        
-#             await msg.edit_text(f'Подписка действует до {paid_date[0]} {month_dict[int(paid_date[1])]} {paid_date[2]} года⏳', reply_markup=inline_kb_back_menu)
-#         else :
-#             if date[1] == None:
-#                 msg = types.Message.to_object(data['Main_message'])
-#                 await msg.edit_text('Ваша подписка ещё ни разу не была оплачена, вы можете сделать это в пункте меню "Оплатить подписку"', reply_markup=inline_kb_back_menu)
-#             else :
-#                 paid_date = date[1].split('-')
-#                 month_dict = {1 : 'Января', 2 : 'Февраля', 3 : 'Марта', 4 : 'Апреля', 5 : 'Мая',
-#                               6 : 'Июня', 7 : 'Июля', 8 : 'Августа', 9 : 'Сенятбря', 10 : 'Октября',
-#                               11 : 'Ноября', 12 : 'Декабря'}      
-#                 msg = types.Message.to_object(data['Main_message'])         
-#                 await msg.edit_text(f'Ваша подписка истекла {paid_date[0]} {month_dict[int(paid_date[1])]} {paid_date[2]} года⏳', reply_markup=inline_kb_back_menu)              
-        
-#     await Menu.next()
-
-# async def buy_sub(callback_query : types.CallbackQuery, state : FSMContext):
-#     await callback_query.answer()  
-#     date = await sqlite_db.check_paid(callback_query.from_user.id)
-#     async with state.proxy() as data:
-#         data['Promo'] = 0
-#         if date[0] == True:
-#             date_paid = date[1].split('-')
-#             month_dict = {1 : 'Января', 2 : 'Февраля', 3 : 'Марта', 4 : 'Апреля', 5 : 'Мая',
-#                           6 : 'Июня', 7 : 'Июля', 8 : 'Августа', 9 : 'Сенятбря', 10 : 'Октября',
-#                           11 : 'Ноября', 12 : 'Декабря'}     
-#             msg = types.Message.to_object(data['Main_message'])          
-#             await msg.edit_text(f'Ваша подписка действует до {date_paid[0]} {month_dict[int(date_paid[1])]} {date_paid[2]} года⏳\nМожете заранее оплатить подписку на месяц вперёд🌟', reply_markup=inline_kb_menu_buy)
-#         else :
-#             if date[1] == None:
-#                 msg = types.Message.to_object(data['Main_message'])
-#                 await msg.edit_text('Ваша подписка ещё ни разу не была оплачена, нажмите на кнопку оплатить, чтобы купить месячную подписку', reply_markup=inline_kb_menu_buy)
-#             else :
-#                 paid_date = date[1].split('-')
-#                 month_dict = {1 : 'Января', 2 : 'Февраля', 3 : 'Марта', 4 : 'Апреля', 5 : 'Мая',
-#                               6 : 'Июня', 7 : 'Июля', 8 : 'Августа', 9 : 'Сенятбря', 10 : 'Октября',
-#                               11 : 'Ноября', 12 : 'Декабря'}   
-#                 msg = types.Message.to_object(data['Main_message'])            
-#                 await msg.edit_text(f'Ваша подписка истекла {paid_date[0]} {month_dict[int(paid_date[1])]} {paid_date[2]} года⏳', reply_markup=inline_kb_menu_buy) 
-#     await Menu.start_pay.set()
-
 async def current_buddy(callback_query : types.CallbackQuery, state : FSMContext):
     await callback_query.answer()
     current = await sqlite_db.current_buddies(callback_query.from_user.id)
@@ -1082,15 +1032,6 @@ async def change_purpose(callback_query : types.CallbackQuery, state : FSMContex
 За каким сейчас вариантом здесь ты? ', reply_markup=kb_purpose)
         data['Change_object'] = 'purpose'   
     await Change.next()    
-    
-# async def change_email(callback_query : types.CallbackQuery, state : FSMContext):
-#     await callback_query.answer()
-#     async with state.proxy() as data:
-#         msg = types.Message.to_object(data['Main_message'])
-#         await msg.edit_text('Введи свой email, для эффективной работы бота⚡️\n\n\
-# Так мы сможем уведомлять тебя о новых событиях, если новости станут для тебя неактуальны, ты всегда сможешь отписаться.', reply_markup=kb_back_change)
-#         data['Change_object'] = 'email'   
-#     await Change.next()   
                             
 async def change_exit(callback_query : types.CallbackQuery, state :  FSMContext):
     await callback_query.answer()
@@ -1186,6 +1127,7 @@ async def impress_nice(callback_query: types.CallbackQuery, state : FSMContext):
     tg_name = await sqlite_db.find_id_from_tg('@' + callback_query.message.text.split('@')[-1])
     await sqlite_db.make_impress(callback_query.from_user.id, tg_name, 2)
     await callback_query.message.edit_text(f'➡️ {callback_query.message.text}\nВпечатление : Отлично✅', reply_markup=None)
+    await bot.send_message(callback_query.from_user.id, "Если вы сделали фотографию, отправьте её боту!\nСамые удачные мы будем публиковать в наших социальных сетях!")
     
 async def impress_bad(callback_query: types.CallbackQuery, state : FSMContext):
     await callback_query.answer()
@@ -1198,6 +1140,7 @@ async def impress_not(callback_query: types.CallbackQuery, state : FSMContext):
     tg_name = await sqlite_db.find_id_from_tg('@' + callback_query.message.text.split('@')[-1])
     await sqlite_db.make_impress(callback_query.from_user.id, tg_name, 0)
     await callback_query.message.edit_text(f'{callback_query.message.text}\n➡️Впечатление : Пока не встретились🔜', reply_markup=None)
+    await bot.send_message(callback_query.from_user.id, "Во время встречи не забудьте сделать фотографию со своим партнёром!\nСамые удачные мы будем публиковать в наших социальных сетях!")
        
 async def active(callback_query: types.CallbackQuery, state : FSMContext):
     await callback_query.answer()      
@@ -1275,6 +1218,15 @@ async def unknown(message : types.Message, state : FSMContext):
         pass
     await message.answer('Неизвестная команда!\nДля навигации в боте импользуйте Меню.\n\
 Введите команду /help если у вас возникли проблемы с ботом')
+    
+async def meet_photo_get(message : types.Message, state : FSMContext):
+    is_valid = await sqlite_db.is_valid_user(message.from_user.username)
+    if (not is_valid):
+        await message.answer('Вам закрыт доступ к сообществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
+        return
+    await bot.send_photo(555581588, message.photo[0].file_id)
+    await bot.send_photo(958255340, message.photo[0].file_id)
+    await message.answer("Фото успешно отправлено администратору!")
 
 
 def register_handlers_client(dp : Dispatcher):
@@ -1402,4 +1354,5 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_callback_query_handler(active, Text(equals='active_user', ignore_case=True), state='*')
     dp.register_callback_query_handler(skip, Text(equals='skip_week', ignore_case=True), state='*')
 
+    dp.register_message_handler(meet_photo_get, content_types=ContentType.PHOTO, state='*')
     dp.register_message_handler(unknown, state='*')

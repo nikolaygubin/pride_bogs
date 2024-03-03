@@ -36,6 +36,7 @@ async def send_invoice_message(user_id, send_id, text):
         await dp.bot.send_message(send_id, text=card, reply_markup=inline_keyboard)
         photo = open('./content/photo/right.jpeg', 'rb')
         await dp.bot.send_photo(send_id, photo=photo)
+        await dp.bot.send_message(send_id, "Во время встречи оффлайн или онлайн не забудьте сделать фотографию с Вашим партнёром и отправить нашему администратору https://t.me/baribeshnik. Самые удачные мы будем опубликовывать в наших социальных сетях!")
         print('Я в блоке')
     
 async def make_pairs():
