@@ -350,8 +350,8 @@ async def is_register(id):
 
 async def get_offline_users():
     cursor.execute(
-        "SELECT id, town FROM users WHERE online = %s and active = %s",
-        (False, True),
+        "SELECT id, town FROM users WHERE online = %s and active = %s and id != %s",
+        (False, True, 705470307),
     )
     offline = cursor.fetchall()
     if offline == None:
@@ -361,8 +361,8 @@ async def get_offline_users():
 
 async def get_online_users():
     cursor.execute(
-        "SELECT id, town FROM users WHERE online = %s and active = %s",
-        (True, True),
+        "SELECT id, town FROM users WHERE online = %s and active = %s and id != %s",
+        (True, True, 705470307),
     )
     online = cursor.fetchall()
     if online == None:
