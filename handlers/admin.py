@@ -23,6 +23,7 @@ inline_kb_panel = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardB
 inline_kb_statistics = InlineKeyboardMarkup(resize_keyboard=True).add(InlineKeyboardButton(text='Количество пользователей', callback_data='count_users')).add(
                 InlineKeyboardButton(text='Количество по городам', callback_data='count_users_town')).add(
                 InlineKeyboardButton(text='Кол-во активных пользователей', callback_data='active_users')).add(
+                InlineKeyboardButton(text='Статистика встреч', callback_data='meet_stat')).add(
                 InlineKeyboardButton(text='Назад', callback_data='back_admin_main'))  
                 
 inline_kb_actions = InlineKeyboardMarkup(resize_keyboard=True).add(
@@ -113,6 +114,15 @@ async def active_users(callback_query : types.callback_query, state : FSMContext
         await msg.edit_text(f'Активных на этой неделе = {await sqlite_db.active_users()}', reply_markup=inline_kb_back_stat)
     await Admin.stat_point.set() 
  
+async def get_meet_stat(callback_query : types.callback_query, state : FSMContext):
+    await callback_query.answer()        
+
+    text = sqlite_db.get_meet_stat()
+    async with state.proxy() as data:
+        msg = types.Message.to_object(data['Admin_message'])
+        await msg.edit_text(text, reply_markup=inline_kb_back_stat)
+    await Admin.stat_point.set() 
+
     
 async def back_stat(callback_query : types.callback_query, state : FSMContext):
     await callback_query.answer()
@@ -236,6 +246,7 @@ def register_handlers_admin(dp : Dispatcher):
     dp.register_callback_query_handler(count_users, Text(equals='count_users', ignore_case=True), state=Admin.statistics)
     dp.register_callback_query_handler(count_users_town, Text(equals='count_users_town', ignore_case=True), state=Admin.statistics)
     dp.register_callback_query_handler(active_users, Text(equals='active_users', ignore_case=True), state=Admin.statistics)
+    dp.register_callback_query_handler(get_meet_stat, Text(equals='meet_stat', ignore_case=True), state=Admin.statistics)
     
     dp.register_callback_query_handler(actions_menu, Text(equals='actives', ignore_case=True), state=Admin.start) # actions_menu
     dp.register_callback_query_handler(back_act, Text(equals='back_act', ignore_case=True), state=Admin.action_point)

@@ -56,10 +56,8 @@ async def make_pairs():
             town = user[1].lower()
             if offline_dict.get(town) == None:
                 offline_dict[town] = list()
-            offline_dict['новосибирск'].append(user[0])
-
-        offline_dict[town].insert(0, 705470307)
-
+            offline_dict[town].append(user[0])
+            
         for town in offline_dict.keys(): # проходимся по всем городам и пытаемся сформировать пары
             town_id = list(offline_dict[town]) # иницализируем массив с пользователями в городе town
             for id in range(len(town_id)): # пытаемся подобрать пару каждому пользователю

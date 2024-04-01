@@ -350,8 +350,8 @@ async def is_register(id):
 
 async def get_offline_users():
     cursor.execute(
-        "SELECT id, town FROM users WHERE online = %s and active = %s and id != %s",
-        (False, True, 705470307),
+        "SELECT id, town FROM users WHERE online = %s and active = %s",
+        (False, True),
     )
     offline = cursor.fetchall()
     if offline == None:
@@ -361,8 +361,8 @@ async def get_offline_users():
 
 async def get_online_users():
     cursor.execute(
-        "SELECT id, town FROM users WHERE online = %s and active = %s and id != %s",
-        (True, True, 705470307),
+        "SELECT id, town FROM users WHERE online = %s and active = %s",
+        (True, True),
     )
     online = cursor.fetchall()
     if online == None:
@@ -710,6 +710,29 @@ async def send_maybe_pair(user_id, send_id, text):
         )
     except:
         print("Я в блоке")
+
+
+async def get_meet_stat():
+    cursor.execute('SELECT * FROM users')
+    users = cursor.fetchall()
+
+    last_impress = 0
+    all_impress = [0, 0]
+
+    for user in users:
+        if user[-1] == False:
+            continue
+
+        if len(user[16]) > 1:
+            last_impress = user[16][-2]
+        else:
+            last_impress = user[16][-1]
+        if last_impress == 0:
+            all_impress[0] += 1
+        else:
+            all_impress[1] += 1
+
+    return f'Воздрежались от выбора или не встретились: {all_impress[0]}\nУспешно встретились: {all_impress[1]}'
 
 
 # async def add_one_week(id):

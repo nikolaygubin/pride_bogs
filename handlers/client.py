@@ -1224,6 +1224,9 @@ async def meet_photo_get(message : types.Message, state : FSMContext):
     if (not is_valid):
         await message.answer('Вам закрыт доступ к сообществу PRIDE RESIDENT\n\nЕсли это случилось по ошибке напишите администратору @baribeshnik')
         return
+    
+    await sqlite_db.make_impress(message.from_user.id, '@' + message.from_user.username, 2)
+
     await bot.send_photo(555581588, message.photo[0].file_id)
     await bot.send_photo(958255340, message.photo[0].file_id)
     await message.answer("Фото успешно отправлено администратору!")
