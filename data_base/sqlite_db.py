@@ -720,7 +720,7 @@ async def get_meet_stat():
     all_impress = [0, 0]
 
     for user in users:
-        if user[-1] == False:
+        if user[-1] == False or len(user[16]) == 0:
             continue
 
         if len(user[16]) > 1:
