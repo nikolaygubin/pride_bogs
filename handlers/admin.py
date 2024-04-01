@@ -117,7 +117,7 @@ async def active_users(callback_query : types.callback_query, state : FSMContext
 async def get_meet_stat(callback_query : types.callback_query, state : FSMContext):
     await callback_query.answer()        
 
-    text = sqlite_db.get_meet_stat()
+    text = await sqlite_db.get_meet_stat()
     async with state.proxy() as data:
         msg = types.Message.to_object(data['Admin_message'])
         await msg.edit_text(text, reply_markup=inline_kb_back_stat)
