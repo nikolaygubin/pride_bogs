@@ -603,6 +603,9 @@ async def get_users_for_is_active():
         id_list.append(user[0])
     return id_list
 
+async def reset_is_active():
+    cursor.execute("UPDATE users SET active = %s", (False, ))
+    base.commit()    
 
 async def write_active(active: bool, id: int):
     cursor.execute("UPDATE users SET active = %s WHERE id = %s", (active, id))

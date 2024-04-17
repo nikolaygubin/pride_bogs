@@ -176,6 +176,7 @@ async def make_extra_pairs():
     
     
 async def is_active():
+    await sqlite_db.reset_is_active()
     users = await sqlite_db.get_users_for_is_active()
     counter = 0
     for user in users:
